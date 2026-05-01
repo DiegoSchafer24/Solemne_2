@@ -1,15 +1,21 @@
 <h1>Mockups</h1>
 <p>Boceto a mano pantalla de titulo</p>
+
 ![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Img_DSG/boceto_titulo.jpeg)
 <p>Boceto a mano gameplay</p>
+
 ![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Img_DSG/boceto_gameplay.jpeg)
 <p>Concepto digital pantalla de titulo</p>
+
 ![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Img_DSG/concepto_titulo.png)
 <p>Concepto digital gameplay (1)</p>
+
 ![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Img_DSG/gameplay(1).png)
 <p>Concepto digital gameplay (2)</p>
+
 ![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Img_DSG/gameplay(2).png)
 <p>Concepto digital gameplay (3)</p>
+
 ![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Img_DSG/gameplay(3).png)
 <h1>Especificaciones de tecnología</h1>
 <h2>Framework Base: Vue 3 (Vite)</h2>
