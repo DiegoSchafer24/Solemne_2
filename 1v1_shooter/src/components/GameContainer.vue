@@ -18,7 +18,7 @@ onMounted(() => {
     physics: {
       default: 'arcade',
       arcade: {
-        gravity: { y: 550, x: 0 },
+        gravity: { y: 1200, x: 0 },
         debug: true //Permite ver las hitboxes
       }
     },
