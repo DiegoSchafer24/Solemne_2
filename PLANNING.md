@@ -12,9 +12,9 @@
 
 - [x] Utilizando pnpm, crear proyecto con plantilla Vue + TypeScript con Vite.
 - [x] Utilizando pnpm, instalar las dependencias base junto con phaser (nuestro motor de juego escogido previamente).
-- [ ] Crear archivo PlayScene.ts, el cual contendra toda la lógica de los personajes, el escenario, las plataformas, las armas.
-- [ ] Crear archivo GameContainer.vue, el cual contiene las configuraciones más generales del juego (físicas, relacion de aspecto de la ventana).
-- [ ] Modificar el archivo principal de Vue (App.vue) que viene en la plantilla para que solo muestre el juego.
+- [x] Crear archivo PlayScene.ts, el cual contendra toda la lógica de los personajes, el escenario, las plataformas, las armas.
+- [x] Crear archivo GameContainer.vue, el cual contiene las configuraciones más generales del juego (físicas, relacion de aspecto de la ventana).
+- [x] Modificar el archivo principal de Vue (App.vue) que viene en la plantilla para que al ejecutar "pnpm run dev" muestre el juego y poder probar que funcione correctamente el codigo de los archivos "PlayScene.ts" y "GameContainer.vue".
 - [ ] Crear una piso basico para que nuestros personajes no esten flotando o caigan al vacio, defininiendo sus propiedades para que los personajes puedan pararse sobre este.
 - [ ] Creación de los 2 personajes (por ahora representados por un cuadrado rojo y uno azul)
 - [ ] Crear la lógica de movimiento de los jugadores; que puedan moverse de lado a lado, saltar y agacharse.
