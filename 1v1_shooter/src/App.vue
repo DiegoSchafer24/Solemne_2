@@ -4,7 +4,6 @@ import GameContainer from './components/GameContainer.vue'
 
 <template>
   <main>
-    <h1>Shooter 1v1</h1>
     <GameContainer />
   </main>
 </template>

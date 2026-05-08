@@ -15,14 +15,15 @@
 - [x] Crear archivo PlayScene.ts, el cual contendra toda la lógica de los personajes, el escenario, las plataformas, las armas.
 - [x] Crear archivo GameContainer.vue, el cual contiene las configuraciones más generales del juego (físicas, relacion de aspecto de la ventana).
 - [x] Modificar el archivo principal de Vue (App.vue) que viene en la plantilla para que al ejecutar "pnpm run dev" muestre el juego y poder probar que funcione correctamente el codigo de los archivos "PlayScene.ts" y "GameContainer.vue".
-- [ ] Crear una piso basico para que nuestros personajes no esten flotando o caigan al vacio, defininiendo sus propiedades para que los personajes puedan pararse sobre este.
-- [ ] Creación de los 2 personajes (por ahora representados por un cuadrado rojo y uno azul)
+- [x] Crear una piso basico para que nuestros personajes no esten flotando o caigan al vacio, defininiendo sus propiedades para que los personajes puedan pararse sobre este.
+- [x] Creación de los 2 personajes (por ahora representados por un cuadrado rojo y uno azul)
 - [ ] Crear la lógica de movimiento de los jugadores; que puedan moverse de lado a lado, saltar y agacharse.
 - [ ] Probar la interacción entre los personajes y el escenario, por ejemplo que estos no lo atraviesen.
 <hr>
 <h1>Semana 3</h1>
 <h2>Tareas planificadas</h2>
 
+- [ ] Implementación de GitHubs actions en el repositorio del proyecto.
 - [ ] Creación de las armas (representadas por ahora por un cuadrado pequeño de color amarillo), haciendo  que aparezcan y que colisionen con el piso (que no atraviesen el escenario).
 - [ ] Crear lógica que permita a los jugadores recoger y soltar estas armas que se encontraran en el piso.
 - [ ] Crear lógica para que las armas puedan ser utilizadas por los jugadores para disparar

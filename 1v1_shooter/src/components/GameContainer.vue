@@ -8,13 +8,17 @@ let game: Phaser.Game | null = null;
 onMounted(() => {
   const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO, //Usa WebGL si está disponible, si no, usa Canvas 2D
-    width: 800,
-    height: 600,
+    width: 1280,
+    height: 720,
     parent: 'game-container',
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH
+    },
     physics: {
       default: 'arcade',
       arcade: {
-        gravity: { y: 300, x: 0 },
+        gravity: { y: 550, x: 0 },
         debug: true //Permite ver las hitboxes
       }
     },
