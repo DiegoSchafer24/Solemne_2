@@ -1,7 +1,7 @@
 <h1>Semana 1</h1>
 <h2>Tareas planificadas</h2>
 
-- [ ] Hacer "Brainstorming" para decidir que tipo de juego queremos desarrollar.
+- [x] Hacer "Brainstorming" para decidir que tipo de juego queremos desarrollar.
 - [x] Estudiar y elegir un motor de juego para utilizar junto a Vue.
 - [x] Crear repositorio en Github.
 - [x] Crear archivo DESIGN.md en el repositorio; este contiene las imagenes conceptuales y especificaciones tecnológicas del juego.
