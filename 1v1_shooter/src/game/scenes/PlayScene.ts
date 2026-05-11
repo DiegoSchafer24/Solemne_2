@@ -2,10 +2,15 @@ import Phaser from 'phaser';
 
 export default class PlayScene extends Phaser.Scene {
 
+    //Escenario
     private floor!: Phaser.GameObjects.Rectangle;
+    private platforms!: Phaser.Physics.Arcade.StaticGroup;
+
+    //Jugadores
     private player1!: Phaser.GameObjects.Rectangle;
     private player2!: Phaser.GameObjects.Rectangle;
 
+    //Movimiento
     private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
     private wasd!: any;
 
@@ -21,10 +26,18 @@ export default class PlayScene extends Phaser.Scene {
 
         //Escenario
         this.cameras.main.setBackgroundColor('#2d2d2d');
-
         this.floor = this.add.rectangle(640, 700, 1280, 200, 0xffffff);
-
         this.physics.add.existing(this.floor, true);
+        this.platforms = this.physics.add.staticGroup();
+        const platLeft = this.add.rectangle(350, 450, 350, 20, 0xffffff);
+        this.physics.add.existing(platLeft, true);
+        this.platforms.add(platLeft);
+        const platRight = this.add.rectangle(930, 450, 350, 20, 0xffffff);
+        this.physics.add.existing(platRight, true);
+        this.platforms.add(platRight);
+        const platTop = this.add.rectangle(640, 280, 350, 20, 0xffffff);
+        this.physics.add.existing(platTop, true);
+        this.platforms.add(platTop);
 
         //Jugadores
         this.player1 = this.add.rectangle(200, 200, 35, 35, 0xff0000);
@@ -40,6 +53,8 @@ export default class PlayScene extends Phaser.Scene {
 
         this.physics.add.collider(this.player1, this.floor);
         this.physics.add.collider(this.player2, this.floor);
+        this.physics.add.collider(this.player1, this.platforms);
+        this.physics.add.collider(this.player2, this.platforms);
 
 
         this.cursors = this.input.keyboard!.createCursorKeys();
@@ -48,8 +63,8 @@ export default class PlayScene extends Phaser.Scene {
     }
 
     update() {
-        const speed = 400;
-        const jumpForce = -600;
+        const speed = 500;
+        const jumpForce = -700;
 
         const body1 = this.player1.body as Phaser.Physics.Arcade.Body;
         const body2 = this.player2.body as Phaser.Physics.Arcade.Body;

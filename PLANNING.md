@@ -23,9 +23,10 @@
 <h1>Semana 3</h1>
 <h2>Tareas planificadas</h2>
 
-- [ ] Añadir más complejidad al escenario (plataformas, obstáculos).
+- [x] Implementación de GitHubs actions en el repositorio del proyecto.
+- [x] Implementación de Dockerfile en el repositorio del proyecto.
+- [x] Añadir más complejidad al escenario (plataformas, obstáculos).
 - [ ] Agregar al movimiento la capacidad para deslizarse y tener un salto en el aire (segundo salto).
-- [ ] Implementación de GitHubs actions en el repositorio del proyecto.
 - [ ] Creación de las armas (representadas por ahora por un cuadrado pequeño de color amarillo), haciendo  que aparezcan y que colisionen con el piso (que no atraviesen el escenario).
 - [ ] Crear lógica que permita a los jugadores recoger y soltar estas armas que se encontraran en el piso.
 - [ ] Crear lógica para que las armas puedan ser utilizadas por los jugadores para disparar

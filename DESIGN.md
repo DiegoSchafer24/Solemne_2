@@ -26,26 +26,34 @@
 <h2>Estructura de carpetas</h2> 
 <p>
 Solemne_2/<br>
-├── .github/workflows/      #CI/CD: main.yml (Linter, Tests, DockerHub)<br>
-├── public/                 #Assets estáticos (Imágenes, Sprites, SFX)<br>
-├── src/<br>
-│   ├── assets/             #Estilos CSS globales<br>
-│   ├── components/         #Componentes Vue (El contenedor del Juego, HUD)<br>
-│   │   └── GameContainer.vue<br>
-│   ├── game/               #Archivos del motor de juego Phaser<br>
-│   │   ├── scenes/         #Escenas: Boot, Menu, PlayScene<br>
-│   │   ├── entities/       #Clases de Jugador y Proyectiles<br>
-│   │   └── main.ts         #Configuración e inicio de Phaser<br>
-│   ├── tests/              #Pruebas unitarias (Vitest)<br>
-│   ├── App.vue             #Componente raíz<br>
-│   └── main.ts             #Punto de entrada de Vue<br>
-├── Dockerfile              #Configuración para contenerizar la app<br>
-├── PLANNING                #Planificación semanal del avanze de desarrollo del juego<br>
-├── README                  #Información importante; Titulo, instrucciones, links.<br>
-├── DESIGN                  #Contiene diseño y especificaciones del juego<br>
-├── Img_DSG                 #Imagenes para utilizar en el archivo DESIGN.md<br>
-├── pnpm-lock.yaml          #Generado automáticamente por pnpm<br>
-└── package.json            #Scripts y dependencias<br>
+├── .github/<br>
+│   └── workflows/<br>
+│       └── main.yml                 #Configuración de GitHub Actions (CI/CD)<br>
+├── Img_DSG/                         #Carpeta que contiene mockups y bocetos<br>
+├── 1v1_shooter/                     #Carpeta principal del juego<br>
+│   ├── public/<br>
+│   ├── src/                         #Código fuente<br>
+│   │   ├── assets/                  #Recursos de Vue<br>
+│   │   ├── components/              #Componentes reactivos de Vue UI<br>
+│   │   │   └── GameContainer.vue    #Contenedor que monta el canvas de Phaser<br>
+│   │   ├── game/                    #Ecosistema exclusivo del motor Phaser<br>
+│   │   │   ├── entities/            #Carpeta para clases de Jugadores/Balas<br>
+│   │   │   └── scenes/<br>
+│   │   │       └── PlayScene.ts     #Lógica del juego: Suelo, plataformas y físicas de los 2 jugadores<br>
+│   │   ├── App.vue                  #Componente raíz de la interfaz Vue<br>
+│   │   ├── main.ts                  #Punto de arranque de Vue<br>
+│   │   └── style.css                #Estilos globales de la página<br>
+│   ├── Dockerfile                   #Configuración multi-etapa para contenerizar la aplicación web en Docker<br>
+│   ├── index.html                   #HTML base donde se inyecta Vite y Vue<br>
+│   ├── package.json                 #Dependencias (Vue, Phaser, Vitest, ESLint) y scripts (dev, build, lint, test)<br>
+│   ├── pnpm-lock.yaml               #Archivo de bloqueo generado por el gestor de paquetes pnpm<br>
+│   ├── tsconfig.json                #Configuración de TypeScript<br>
+│   └── vite.config.ts               #Configuración del empaquetador Vite<br>
+├── .gitattributes                   #Archivo que previene errores por inconsistencias en saltos de linea<br>
+├── .gitignore                       #Archivo para excluir archivos innecesarios<br>
+├── DESIGN.md                        #Documento de diseño inicial con especificaciones y descripción del juego<br>
+├── PLANNING.md                      #Planificación del proyecto con objetivos semanales<br>
+└── README.md                        #Archivo con título, descripción e instrucciones de ejecución local y Docker<br>
 </p>
 <h2>Dependencias principales</h2> 
 <p>Las principales dependencias a ser instaladas utilizando pnpm seran: Vue, Phaser, Typescript, Vite, Vitest, Prettier.</p>
