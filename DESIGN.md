@@ -39,7 +39,11 @@ Solemne_2/<br>
 │   │   ├── game/                    #Ecosistema exclusivo del motor Phaser<br>
 │   │   │   ├── entities/            #Carpeta para clases de Jugadores/Balas<br>
 │   │   │   └── scenes/<br>
-│   │   │       └── PlayScene.ts     #Lógica del juego: Suelo, plataformas y físicas de los 2 jugadores<br>
+│   │   │   │   └── PlayScene.ts     #Lógica del juego, suelo, plataformas<br>
+│   │   │   └── utils/                  
+│   │   │   │   └── physicsLogic.ts  #Logica de físicas y movimiento
+│   │   ├── tests/                   #Pruebas unitarias
+│   │   │   └── physicsLogic.test.ts
 │   │   ├── App.vue                  #Componente raíz de la interfaz Vue<br>
 │   │   ├── main.ts                  #Punto de arranque de Vue<br>
 │   │   └── style.css                #Estilos globales de la página<br>
