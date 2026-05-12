@@ -1,10 +1,10 @@
 import Phaser from 'phaser';
 import { calculateDrag, validateJump } from '../utils/physicsLogic';
+import Weapon from '../entities/Weapon';
 
 export default class PlayScene extends Phaser.Scene {
 
     //Escenario
-    private floor!: Phaser.GameObjects.Rectangle;
     private platforms!: Phaser.Physics.Arcade.StaticGroup;
 
     //Jugadores
@@ -17,6 +17,8 @@ export default class PlayScene extends Phaser.Scene {
     private p1CanDoubleJump: boolean = true;
     private p2CanDoubleJump: boolean = true;
 
+    //Armas
+    private weapons!: Phaser.Physics.Arcade.Group;
 
     constructor() {
         super({ key: 'PlayScene' });
@@ -30,24 +32,31 @@ export default class PlayScene extends Phaser.Scene {
 
         //Escenario
         this.cameras.main.setBackgroundColor('#2d2d2d');
-        this.floor = this.add.rectangle(640, 700, 1280, 200, 0xffffff);
-        this.physics.add.existing(this.floor, true);
         this.platforms = this.physics.add.staticGroup();
-        const platLeft1 = this.add.rectangle(300, 500, 350, 25, 0xffffff);
-        this.physics.add.existing(platLeft1, true);
-        this.platforms.add(platLeft1);
-        const platLeft2 = this.add.rectangle(400, 400, 350, 25, 0xffffff);
-        this.physics.add.existing(platLeft2, true);
-        this.platforms.add(platLeft2);
-        const platRight1 = this.add.rectangle(980, 500, 350, 25, 0xffffff);
-        this.physics.add.existing(platRight1, true);
-        this.platforms.add(platRight1);
-        const platRight2 = this.add.rectangle(880, 400, 350, 25, 0xffffff);
-        this.physics.add.existing(platRight2, true);
-        this.platforms.add(platRight2);
-        const platTop = this.add.rectangle(640, 300, 500, 25, 0xffffff);
-        this.physics.add.existing(platTop, true);
-        this.platforms.add(platTop);
+
+        const levelData = [
+            { x: 640, y: 700, width: 1280, height: 200 }, //Suelo base
+            { x: 350, y: 480, width: 250, height: 20 },   //Izquierda
+            { x: 930, y: 480, width: 250, height: 20 },   //Derecha
+            { x: 640, y: 280, width: 350, height: 20 }    //Arriba centro
+        ];
+
+        levelData.forEach(data => {
+            const plat = this.add.rectangle(data.x, data.y, data.width, data.height, 0xffffff);
+            this.physics.add.existing(plat, true);
+            
+            this.platforms.add(plat);
+        });
+
+        //Armas
+        this.weapons = this.physics.add.group({
+        allowGravity: true,
+        immovable: false
+        });
+        const pistol = new Weapon(this, 640, 400, 'Pistola', 0xffff00, 15, 400);
+        this.weapons.add(pistol);
+        const shotgun = new Weapon(this, 640, 200, 'Escopeta', 0xffaa00, 5, 1000);
+        this.weapons.add(shotgun);
 
         //Jugadores
         this.player1 = this.add.rectangle(50, 500, 35, 35, 0xff0000);
@@ -65,11 +74,10 @@ export default class PlayScene extends Phaser.Scene {
         (this.player1.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(true);
         (this.player2.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(true);
 
-        this.physics.add.collider(this.player1, this.floor);
-        this.physics.add.collider(this.player2, this.floor);
         this.physics.add.collider(this.player1, this.platforms);
         this.physics.add.collider(this.player2, this.platforms);
 
+        this.physics.add.collider(this.weapons, this.platforms);
 
         this.cursors = this.input.keyboard!.createCursorKeys();
         this.wasd = this.input.keyboard!.addKeys('W,A,S,D');

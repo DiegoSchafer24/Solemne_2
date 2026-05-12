@@ -27,7 +27,7 @@
 - [x] Implementación de Dockerfile en el repositorio del proyecto.
 - [x] Añadir más complejidad al escenario (plataformas, obstáculos).
 - [x] Agregar al movimiento la capacidad para deslizarse y tener un salto en el aire (segundo salto).
-- [ ] Creación de las armas (representadas por ahora por un cuadrado pequeño de color amarillo), haciendo  que aparezcan y que colisionen con el piso (que no atraviesen el escenario).
+- [x] Creación de las armas (representadas por ahora por un cuadrado pequeño de color amarillo), haciendo  que aparezcan y que colisionen con el piso (que no atraviesen el escenario).
 - [ ] Crear lógica que permita a los jugadores recoger y soltar estas armas que se encontraran en el piso.
 - [ ] Crear lógica para que las armas puedan ser utilizadas por los jugadores para disparar
 - [ ] Lograr que las balas hagan daño al entrar en contacto con el otro jugador y que esto se registre correctamente (se le resta un punto de vida).
