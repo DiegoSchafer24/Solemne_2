@@ -5,6 +5,7 @@ export default class Weapon extends Phaser.GameObjects.Rectangle {
   public maxAmmo: number;
   public currentAmmo: number;
   public fireRate: number;
+  public isEquipped: boolean = false;
 
   constructor(
     scene: Phaser.Scene, 
@@ -26,6 +27,8 @@ export default class Weapon extends Phaser.GameObjects.Rectangle {
     scene.add.existing(this);
     
     scene.physics.add.existing(this);
+
+  this.setDepth(20);    
 
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setCollideWorldBounds(true);

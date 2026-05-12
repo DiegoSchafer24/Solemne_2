@@ -19,6 +19,10 @@ export default class PlayScene extends Phaser.Scene {
 
     //Armas
     private weapons!: Phaser.Physics.Arcade.Group;
+    private p1Weapon: Weapon | null = null;
+    private p2Weapon: Weapon | null = null;
+    private p1Interact!: { E: Phaser.Input.Keyboard.Key, Q: Phaser.Input.Keyboard.Key };
+    private p2Interact!: { PICK: Phaser.Input.Keyboard.Key, DROP: Phaser.Input.Keyboard.Key };
 
     constructor() {
         super({ key: 'PlayScene' });
@@ -61,12 +65,14 @@ export default class PlayScene extends Phaser.Scene {
         //Jugadores
         this.player1 = this.add.rectangle(50, 500, 35, 35, 0xff0000);
         this.player1.setOrigin(0.5, 1);
+        this.player1.setDepth(10);
         this.physics.add.existing(this.player1);
         const body1 = this.player1.body as Phaser.Physics.Arcade.Body;
         body1.setMaxVelocity(400, 800);
 
         this.player2 = this.add.rectangle(1230, 500, 35, 35, 0x0000ff);
         this.player2.setOrigin(0.5, 1);
+        this.player2.setDepth(10);
         this.physics.add.existing(this.player2);
         const body2 = this.player2.body as Phaser.Physics.Arcade.Body;
         body2.setMaxVelocity(400, 800);
@@ -81,6 +87,12 @@ export default class PlayScene extends Phaser.Scene {
 
         this.cursors = this.input.keyboard!.createCursorKeys();
         this.wasd = this.input.keyboard!.addKeys('W,A,S,D');
+
+        this.p1Interact = this.input.keyboard!.addKeys('E,Q') as any;
+        this.p2Interact = {
+            PICK: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.PERIOD), // .
+            DROP: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.COMMA)   // ,
+        };
 
     }
 
@@ -152,5 +164,71 @@ export default class PlayScene extends Phaser.Scene {
         }
       }
     }
+
+    if (Phaser.Input.Keyboard.JustDown(this.p1Interact.E)) {
+        this.tryPickUpWeapon(this.player1, 1);
+    }
+    if (Phaser.Input.Keyboard.JustDown(this.p1Interact.Q)) {
+        this.dropWeapon(1);
+    }
+
+    if (Phaser.Input.Keyboard.JustDown(this.p2Interact.PICK)) {
+        this.tryPickUpWeapon(this.player2, 2);
+    }
+    if (Phaser.Input.Keyboard.JustDown(this.p2Interact.DROP)) {
+        this.dropWeapon(2);
+    }
+    
+    if (this.p1Weapon) {
+        this.p1Weapon.setPosition(this.player1.x, this.player1.y - 15);
+    }
+    
+    if (this.p2Weapon) {
+        this.p2Weapon.setPosition(this.player2.x, this.player2.y - 15);
+    }
+
   }
+
+  private tryPickUpWeapon(player: Phaser.GameObjects.Rectangle, playerNum: number) {
+
+    if (playerNum === 1 && this.p1Weapon) return;
+    if (playerNum === 2 && this.p2Weapon) return;
+
+    this.physics.world.overlap(player, this.weapons, (p, w) => {
+        const weapon = w as Weapon;
+
+        if (weapon.isEquipped) return;
+
+        if (playerNum === 1 && this.p1Weapon) return;
+        if (playerNum === 2 && this.p2Weapon) return;
+
+        weapon.isEquipped = true;
+        const body = weapon.body as Phaser.Physics.Arcade.Body;
+        body.setEnable(false);
+
+        if (playerNum === 1) this.p1Weapon = weapon;
+        if (playerNum === 2) this.p2Weapon = weapon;
+    });
+  }
+
+  private dropWeapon(playerNum: number) {
+    let weaponToDrop: Weapon | null = null;
+
+    if (playerNum === 1 && this.p1Weapon) {
+        weaponToDrop = this.p1Weapon;
+        this.p1Weapon = null;
+    } else if (playerNum === 2 && this.p2Weapon) {
+        weaponToDrop = this.p2Weapon;
+        this.p2Weapon = null;
+    }
+
+    if (weaponToDrop) {
+        weaponToDrop.isEquipped = false;
+        
+        const body = weaponToDrop.body as Phaser.Physics.Arcade.Body;
+        body.setEnable(true);
+        body.setVelocityY(-200);
+    }
+  }
+
 }
