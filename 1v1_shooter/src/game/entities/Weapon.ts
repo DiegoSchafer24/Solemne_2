@@ -5,33 +5,37 @@ export default class Weapon extends Phaser.GameObjects.Rectangle {
   public maxAmmo: number;
   public currentAmmo: number;
   public fireRate: number;
+  public bulletSpeed: number;
+  public range: number;
   public isEquipped: boolean = false;
+  public lastFired: number = 0;
 
   constructor(
-    scene: Phaser.Scene, 
-    x: number, 
-    y: number, 
-    name: string, 
-    color: number, 
-    maxAmmo: number, 
-    fireRate: number
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    name: string,
+    color: number,
+    maxAmmo: number,
+    fireRate: number,
+    bulletSpeed: number,
+    range: number
   ) {
 
     super(scene, x, y, 30, 15, color);
-    
+
     this.name = name;
     this.maxAmmo = maxAmmo;
     this.currentAmmo = maxAmmo;
     this.fireRate = fireRate;
+    this.bulletSpeed = bulletSpeed;
+    this.range = range;
 
     scene.add.existing(this);
-    
     scene.physics.add.existing(this);
-
-  this.setDepth(20);    
+    this.setDepth(20);
 
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setCollideWorldBounds(true);
     body.setDragX(100);
   }
 }
