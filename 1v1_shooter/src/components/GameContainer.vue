@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted } from 'vue';
 import Phaser from 'phaser';
 import PlayScene from '../game/scenes/PlayScene';
+import { uiState } from '../state/uiState';
 
 let game: Phaser.Game | null = null;
 
@@ -36,15 +37,70 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div id="game-container"></div>
+  <div class="game-wrapper">
+    
+    <div class="hud">
+      <div class="health-bar p1">
+        <svg v-for="i in 3" :key="'p1-'+i" class="heart" viewBox="0 0 24 24" 
+             :stroke="uiState.p1.color" 
+             :fill="i <= uiState.p1.lives ? uiState.p1.color : 'none'">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </div>
+
+      <div class="health-bar p2">
+        <svg v-for="i in 3" :key="'p2-'+i" class="heart" viewBox="0 0 24 24" 
+             :stroke="uiState.p2.color" 
+             :fill="i <= uiState.p2.lives ? uiState.p2.color : 'none'">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </div>
+    </div>
+    
+    <div id="game-container"></div>
+  </div>
 </template>
 
 <style scoped>
+.game-wrapper {
+  position: relative;
+  width: 1280px;
+  max-width: 100vw;
+  height: 720px;
+  max-height: 100vh;
+  margin: 2rem auto;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  background-color: #2d2d2d;
+}
+
 #game-container {
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 2rem;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5); /* Un pequeño borde para distinguir el canvas */
+}
+
+.hud {
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  right: 30px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.health-bar {
+  display: flex;
+}
+
+.heart {
+  width: 40px;
+  height: 40px;
+  stroke-width: 2;
+  margin: 0 5px;
+  transition: fill 0.3s ease;
 }
 </style>

@@ -30,7 +30,7 @@
 - [x] Creación de las armas (representadas por ahora por un cuadrado pequeño de color amarillo), haciendo  que aparezcan y que colisionen con el piso (que no atraviesen el escenario).
 - [x] Crear lógica que permita a los jugadores recoger y soltar estas armas que se encontraran en el piso.
 - [x] Crear lógica para que las armas puedan ser utilizadas por los jugadores para disparar
-- [ ] Lograr que las balas hagan daño al entrar en contacto con el otro jugador y que esto se registre correctamente (se le resta un punto de vida).
+- [x] Lograr que las balas hagan daño al entrar en contacto con el otro jugador y que esto se registre correctamente (se le resta un punto de vida).
 - [ ] Hacer que el juego termine correctamente al momento que un jugador gane.
 <hr>
 <h1>Semana 4</h1>

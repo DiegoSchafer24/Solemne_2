@@ -1,7 +1,9 @@
 import Phaser from 'phaser';
 import { calculateDrag, validateJump } from '../utils/physicsLogic';
+import { canTakeDamage } from '../utils/playerLogic';
 import Weapon from '../entities/Weapon';
 import { canShoot } from '../utils/weaponLogic';
+import { uiState } from '../../state/uiState';
 
 
 export default class PlayScene extends Phaser.Scene {
@@ -15,6 +17,8 @@ export default class PlayScene extends Phaser.Scene {
     private player2!: Phaser.GameObjects.Rectangle;
     private p1FacingRight: boolean = true;
     private p2FacingRight: boolean = false;
+    private p1Status = { isDead: false, isInvul: false, spawnX: 50, spawnY: 500 };
+    private p2Status = { isDead: false, isInvul: false, spawnX: 1230, spawnY: 500 };
 
     //Movimiento
     private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -128,13 +132,21 @@ export default class PlayScene extends Phaser.Scene {
         this.physics.add.existing(deathZone, true);
 
         this.physics.add.overlap(this.player1, deathZone, () => {
-            this.player1.setPosition(50, 500);
-            (this.player1.body as Phaser.Physics.Arcade.Body).setVelocity(0, 0);
+            this.killPlayer(1, true);
         });
 
         this.physics.add.overlap(this.player2, deathZone, () => {
-            this.player2.setPosition(1230, 500);
-            (this.player2.body as Phaser.Physics.Arcade.Body).setVelocity(0, 0);
+            this.killPlayer(2, true);
+        });
+
+        this.physics.add.overlap(this.bullets, this.player1, (_player, bullet) => {
+            bullet.destroy();
+            this.killPlayer(1);
+        });
+
+        this.physics.add.overlap(this.bullets, this.player2, (_player, bullet) => {
+            bullet.destroy();
+            this.killPlayer(2);
         });
 
     }
@@ -149,6 +161,7 @@ export default class PlayScene extends Phaser.Scene {
         const body2 = this.player2.body as Phaser.Physics.Arcade.Body;
 
         //Jugador 1
+        if (!this.p1Status.isDead) {
         body1.setAccelerationX(0);
 
         const isP1Crouching = this.wasd.S.isDown;
@@ -183,8 +196,10 @@ export default class PlayScene extends Phaser.Scene {
                 }
             }
         }
+        }
 
         //Jugador 2
+        if (!this.p2Status.isDead) {
         body2.setAccelerationX(0);
 
         const isP2Crouching = this.cursors.down.isDown;
@@ -218,6 +233,7 @@ export default class PlayScene extends Phaser.Scene {
                     this.p2CanDoubleJump = false;
                 }
             }
+        }
         }
 
         if (Phaser.Input.Keyboard.JustDown(this.p1Interact.E)) {
@@ -371,6 +387,47 @@ export default class PlayScene extends Phaser.Scene {
             bullet.setData('originX', bullet.x);
             bullet.setData('range', weapon.range);
         }
+    }
+
+    private killPlayer(playerNum: number, ignoreInvul: boolean = false) {
+        const status = playerNum === 1 ? this.p1Status : this.p2Status;
+        const player = playerNum === 1 ? this.player1 : this.player2;
+        const ui = playerNum === 1 ? uiState.p1 : uiState.p2;
+
+        if (!canTakeDamage(status.isDead, status.isInvul, ignoreInvul)) return;
+
+        status.isDead = true;
+        ui.lives--; 
+        
+        this.dropWeapon(playerNum); 
+        player.setVisible(false); 
+        (player.body as Phaser.Physics.Arcade.Body).setEnable(false); 
+
+        this.time.delayedCall(3000, () => {
+            player.setPosition(status.spawnX, status.spawnY);
+            player.setVisible(true);
+            
+            const body = player.body as Phaser.Physics.Arcade.Body;
+            body.setEnable(true);
+            body.setVelocity(0, 0);
+
+            status.isDead = false;
+            status.isInvul = true;
+
+            const blink = this.tweens.add({
+                targets: player,
+                alpha: 0.2,
+                yoyo: true,
+                repeat: -1,
+                duration: 150
+            });
+
+            this.time.delayedCall(2000, () => {
+                status.isInvul = false;
+                blink.stop();
+                player.setAlpha(1); 
+            });
+        });
     }
 
 }

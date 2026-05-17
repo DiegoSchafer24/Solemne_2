@@ -38,20 +38,30 @@ Solemne_2/<br>
 │   │   │   └── GameContainer.vue    #Contenedor que monta el canvas de Phaser<br>
 │   │   ├── game/                    #Ecosistema exclusivo del motor Phaser<br>
 │   │   │   ├── entities/            #Carpeta para clases de Jugadores/Balas<br>
+│   │   │   │   └── Weapon.ts        #Clases con rango y velocidad de armas<br>
 │   │   │   └── scenes/<br>
 │   │   │   │   └── PlayScene.ts     #Lógica del juego, suelo, plataformas<br>
-│   │   │   └── utils/                  
-│   │   │   │   └── physicsLogic.ts  #Logica de físicas y movimiento
-│   │   ├── tests/                   #Pruebas unitarias
-│   │   │   └── physicsLogic.test.ts
+│   │   │   └── utils/<br>
+│   │   │       ├── physicsLogic.ts  #Logica de físicas y movimiento<br>
+│   │   │       ├── weaponLogic.ts   #Lógica de disparo<br>
+│   │   │       └── playerLogic.ts   #Lógica de daño a jugadores<br>
+│   │   ├── state/                   #Directorio de estado global<br>
+│   │   │   └── uiState.ts           #Puente reactivo entre Vue y Phaser para manejar la UI (Vidas y colores)<br>
+│   │   ├── tests/                   #Pruebas unitarias<br>
+│   │   │   └── physicsLogic.test.ts #Pruebas unitarias de físicas y movimiento<br>
+│   │   │   └── weaponLogic.test.ts  #Pruebas unitarias de armas<br>
+│   │   │   └── playerLogic.test.ts  #Pruebas unitarias de daño a jugadores<br>
 │   │   ├── App.vue                  #Componente raíz de la interfaz Vue<br>
 │   │   ├── main.ts                  #Punto de arranque de Vue<br>
 │   │   └── style.css                #Estilos globales de la página<br>
 │   ├── Dockerfile                   #Configuración multi-etapa para contenerizar la aplicación web en Docker<br>
+│   ├── eslint.config.js             #Configuración para el linter<br>
 │   ├── index.html                   #HTML base donde se inyecta Vite y Vue<br>
 │   ├── package.json                 #Dependencias (Vue, Phaser, Vitest, ESLint) y scripts (dev, build, lint, test)<br>
 │   ├── pnpm-lock.yaml               #Archivo de bloqueo generado por el gestor de paquetes pnpm<br>
-│   ├── tsconfig.json                #Configuración de TypeScript<br>
+│   ├── tsconfig.app.json            #Configuración de TypeScript para el código de tu juego y frontend (Phaser/Vue)<br>
+│   ├── tsconfig.json                #Archivo principal que agrupa y coordina las configuraciones de TypeScript (app y node)<br>
+│   ├── tsconfig.node.json           #Configuración de TypeScript para los archivos de configuración del entorno (como vite.config.ts)<br>
 │   └── vite.config.ts               #Configuración del empaquetador Vite<br>
 ├── .gitattributes                   #Archivo que previene errores por inconsistencias en saltos de linea<br>
 ├── .gitignore                       #Archivo para excluir archivos innecesarios<br>
