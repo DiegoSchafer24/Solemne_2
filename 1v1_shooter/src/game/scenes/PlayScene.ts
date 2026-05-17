@@ -4,6 +4,7 @@ import { canTakeDamage } from '../utils/playerLogic';
 import Weapon from '../entities/Weapon';
 import { canShoot } from '../utils/weaponLogic';
 import { uiState } from '../../state/uiState';
+import { checkWinner } from '../utils/gameLogic';
 
 
 export default class PlayScene extends Phaser.Scene {
@@ -19,6 +20,8 @@ export default class PlayScene extends Phaser.Scene {
     private p2FacingRight: boolean = false;
     private p1Status = { isDead: false, isInvul: false, spawnX: 50, spawnY: 500 };
     private p2Status = { isDead: false, isInvul: false, spawnX: 1230, spawnY: 500 };
+    private isGameOver: boolean = false;
+    private pendingGameOver: boolean = false;
 
     //Movimiento
     private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -152,6 +155,9 @@ export default class PlayScene extends Phaser.Scene {
     }
 
     update() {
+
+        if (this.isGameOver) return;
+
         const accel = 2500;
         const normalDrag = 1500;
         const slideDrag = 300;
@@ -397,7 +403,25 @@ export default class PlayScene extends Phaser.Scene {
         if (!canTakeDamage(status.isDead, status.isInvul, ignoreInvul)) return;
 
         status.isDead = true;
-        ui.lives--; 
+        ui.lives--;
+
+        if (uiState.p1.lives <= 0 || uiState.p2.lives <= 0) {
+            if (!this.pendingGameOver) {
+                this.pendingGameOver = true; 
+
+                this.time.delayedCall(100, () => {
+                    const winner = checkWinner(uiState.p1.lives, uiState.p2.lives);
+                    if (winner !== null) {
+                        this.endGame(winner);
+                    }
+                });
+            }
+
+            this.dropWeapon(playerNum); 
+            player.setVisible(false); 
+            (player.body as Phaser.Physics.Arcade.Body).setEnable(false); 
+            return; 
+        }
         
         this.dropWeapon(playerNum); 
         player.setVisible(false); 
@@ -428,6 +452,46 @@ export default class PlayScene extends Phaser.Scene {
                 player.setAlpha(1); 
             });
         });
+    }
+
+    private endGame(winnerNum: number) {
+        this.isGameOver = true;
+        this.physics.pause();
+
+        let targetX = 640;
+        let targetY = 360;
+
+        if (winnerNum !== 0) { 
+            const winnerPlayer = winnerNum === 1 ? this.player1 : this.player2;
+            const loserPlayer = winnerNum === 1 ? this.player2 : this.player1;
+            loserPlayer.setVisible(false);
+            
+            targetX = winnerPlayer.x;
+            targetY = winnerPlayer.y;
+        } else {
+            this.player1.setVisible(false);
+            this.player2.setVisible(false);
+        }
+
+        this.cameras.main.stopFollow(); 
+        this.cameras.main.pan(targetX, targetY, 1000, 'Power2');
+        this.cameras.main.zoomTo(1.8, 1000, 'Power2');
+
+        const textStr = winnerNum === 0 ? 'Tie!' : `Player ${winnerNum} wins!`;
+        const textColor = winnerNum === 0 ? '#ffffff' : (winnerNum === 1 ? '#ff0000' : '#0000ff');
+        
+        const winText = this.add.text(640, 360, textStr, {
+            fontSize: '45px', 
+            color: textColor, 
+            fontStyle: 'bold',
+            backgroundColor: '#000000aa',
+            padding: { x: 30, y: 15 },
+            align: 'center'
+        });
+        
+        winText.setOrigin(0.5);
+        winText.setScrollFactor(0);
+        winText.setDepth(100);
     }
 
 }

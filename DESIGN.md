@@ -42,14 +42,16 @@ Solemne_2/<br>
 │   │   │   └── scenes/<br>
 │   │   │   │   └── PlayScene.ts     #Lógica del juego, suelo, plataformas<br>
 │   │   │   └── utils/<br>
+│   │   │       ├── gameLogic.ts     #Logica de condiciones de victoria/empate<br>
 │   │   │       ├── physicsLogic.ts  #Logica de físicas y movimiento<br>
 │   │   │       ├── weaponLogic.ts   #Lógica de disparo<br>
 │   │   │       └── playerLogic.ts   #Lógica de daño a jugadores<br>
 │   │   ├── state/                   #Directorio de estado global<br>
 │   │   │   └── uiState.ts           #Puente reactivo entre Vue y Phaser para manejar la UI (Vidas y colores)<br>
 │   │   ├── tests/                   #Pruebas unitarias<br>
-│   │   │   └── physicsLogic.test.ts #Pruebas unitarias de físicas y movimiento<br>
-│   │   │   └── weaponLogic.test.ts  #Pruebas unitarias de armas<br>
+│   │   │   ├── gameLogic.test.ts    #Pruebas unitarias de condiciones de victoria/empate<br>
+│   │   │   ├── physicsLogic.test.ts #Pruebas unitarias de físicas y movimiento<br>
+│   │   │   ├── weaponLogic.test.ts  #Pruebas unitarias de armas<br>
 │   │   │   └── playerLogic.test.ts  #Pruebas unitarias de daño a jugadores<br>
 │   │   ├── App.vue                  #Componente raíz de la interfaz Vue<br>
 │   │   ├── main.ts                  #Punto de arranque de Vue<br>

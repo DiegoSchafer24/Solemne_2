@@ -68,8 +68,7 @@ onUnmounted(() => {
   max-width: 100vw;
   height: 720px;
   max-height: 100vh;
-  margin: 2rem auto;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  box-shadow: 0 0 20px rgba(0,0,0,0.8);
   background-color: #2d2d2d;
 }
 
