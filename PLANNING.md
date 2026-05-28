@@ -36,7 +36,9 @@
 <h1>Semana 4</h1>
 <h2>Tareas planificadas</h2>
 
-- [ ] Crear las visuales para los personajes, armas y escenario.
+- [ ] Crear las visuales para los personajes.
+- [x] Crear las visuales para el escenario.
+- [ ] Crear las visuales para las armas.
 - [ ] Crear las animaciones para los personajes y lograr implementarlas correctamente.
 - [ ] Creación de audio (música y efectos de sonido).
 - [ ] Creación de menú principal
