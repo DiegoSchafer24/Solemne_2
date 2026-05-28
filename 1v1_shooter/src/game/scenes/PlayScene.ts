@@ -59,6 +59,7 @@ export default class PlayScene extends Phaser.Scene {
         bg.setScrollFactor(0);
         bg.setScale(1.7);
         bg.setTint(0x777777);
+        uiState.isMenu = false;
 
         //Escenario
         this.platforms = this.physics.add.staticGroup();
