@@ -6,14 +6,11 @@ import { uiState } from '../../state/uiState';
 import { checkWinner } from '../utils/gameLogic';
 import Player from '../entities/Player';
 
-
 export default class PlayScene extends Phaser.Scene {
 
-    //Escenario
     private platforms!: Phaser.Physics.Arcade.StaticGroup;
     private cameraTarget!: Phaser.GameObjects.Zone;
 
-    //Jugadores
     private player1!: Player;
     private player2!: Player;
     private p1Status = { isDead: false, isInvul: false, spawnX: 50, spawnY: 500 };
@@ -21,11 +18,9 @@ export default class PlayScene extends Phaser.Scene {
     private isGameOver: boolean = false;
     private pendingGameOver: boolean = false;
 
-    //Movimiento
     private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
     private wasd!: any;
 
-    //Armas
     private weapons!: Phaser.Physics.Arcade.Group;
     private p1Weapon: Weapon | null = null;
     private p2Weapon: Weapon | null = null;
@@ -42,35 +37,34 @@ export default class PlayScene extends Phaser.Scene {
     }
 
     preload() {
-
         this.load.image('bg', '/assets/background.jpg');
         this.load.image('floor_tex', '/assets/floor_tex.png');
         this.load.image('platform_tex', '/assets/platform_tex.png');
-        const frameConf = { frameWidth: 32, frameHeight: 48 };
-        this.load.spritesheet('player_idle_unarmed', '/assets/characters/player_idle_unarmed.png', frameConf);
-        this.load.spritesheet('player_walk_unarmed', '/assets/characters/player_walk_unarmed.png', frameConf);
         
+        const frameConf = { frameWidth: 32, frameHeight: 48 };
+        this.load.spritesheet('player_idle', '/assets/characters/player_idle.png', frameConf);
+        this.load.spritesheet('player_walk', '/assets/characters/player_walk.png', frameConf);
+        this.load.spritesheet('player_jump', '/assets/characters/player_jump.png', frameConf);
+        this.load.spritesheet('player_crouch', '/assets/characters/player_crouch.png', frameConf);
+        this.load.spritesheet('player_slide', '/assets/characters/player_slide.png', frameConf);
     }
 
     create() {
-
-        //Fondo
         const bg = this.add.image(640, 360, 'bg').setDepth(-100);
         bg.setScrollFactor(0);
         bg.setScale(1.7);
         bg.setTint(0x777777);
         uiState.isMenu = false;
 
-        //Escenario
         this.platforms = this.physics.add.staticGroup();
         this.cameraTarget = this.add.zone(640, 360, 1, 1);
         this.cameras.main.startFollow(this.cameraTarget, false, 0.1, 0.1);
 
         const levelData = [
-            { x: 640, y: 700, width: 1280, height: 200, texture: 'floor_tex' },  // Suelo base
-            { x: 350, y: 480, width: 250, height: 20, texture: 'platform_tex' }, // Plataforma izquierda   
-            { x: 930, y: 480, width: 250, height: 20, texture: 'platform_tex' }, // Plataforma derecha   
-            { x: 640, y: 280, width: 350, height: 20, texture: 'platform_tex' }  // Plataforma central superior  
+            { x: 640, y: 700, width: 1280, height: 200, texture: 'floor_tex' },
+            { x: 350, y: 480, width: 250, height: 20, texture: 'platform_tex' },  
+            { x: 930, y: 480, width: 250, height: 20, texture: 'platform_tex' },  
+            { x: 640, y: 280, width: 350, height: 20, texture: 'platform_tex' }  
         ];
 
         levelData.forEach(data => {
@@ -82,26 +76,20 @@ export default class PlayScene extends Phaser.Scene {
             this.platforms.add(platformElement);
         });
 
-        const states = ['idle', 'walk', 'jump', 'crouch', 'die', 'fall', 'slide'];
-        const weapons = ['unarmed', 'pistol', 'shotgun'];
+        const states = ['idle', 'walk', 'jump', 'crouch', 'slide'];
         
         states.forEach(s => {
-            weapons.forEach(w => {
-                const key = `${s}-${w}`;
-                const spriteKey = `player_${s}_${w}`;
-                
-                if (this.textures.exists(spriteKey)) { 
-                    this.anims.create({
-                        key: key,
-                        frames: this.anims.generateFrameNumbers(spriteKey, { start: 0 }),
-                        frameRate: 10,
-                        repeat: s === 'die' ? 0 : -1
-                    });
-                }
-            });
+            const spriteKey = `player_${s}`;
+            if (this.textures.exists(spriteKey)) { 
+                this.anims.create({
+                    key: s,
+                    frames: this.anims.generateFrameNumbers(spriteKey, { start: 0 }),
+                    frameRate: 8,
+                    repeat: (s === 'jump' || s === 'crouch' || s === 'slide') ? 0 : -1 
+                });
+            }
         });
 
-        //Armas
         this.weapons = this.physics.add.group({
             allowGravity: true,
             immovable: false
@@ -132,21 +120,19 @@ export default class PlayScene extends Phaser.Scene {
         this.p1Shoot = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.p2Shoot = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.MINUS);
 
-        //Jugadores
         this.cursors = this.input.keyboard!.createCursorKeys();
         this.wasd = this.input.keyboard!.addKeys('W,A,S,D');
 
-        this.player1 = new Player(this, 50, 500, 'player_idle_unarmed', this.wasd, true, 0xff0000);
+        this.player1 = new Player(this, 50, 500, 'player_idle', this.wasd, true, 0xff0000);
         const body1 = this.player1.body as Phaser.Physics.Arcade.Body;
         body1.setMaxVelocity(400, 800);
 
-        this.player2 = new Player(this, 1230, 500, 'player_idle_unarmed', this.cursors, false, 0x0000ff);
+        this.player2 = new Player(this, 1230, 500, 'player_idle', this.cursors, false, 0x0000ff);
         const body2 = this.player2.body as Phaser.Physics.Arcade.Body;
         body2.setMaxVelocity(400, 800);
 
         this.physics.add.collider(this.player1, this.platforms);
         this.physics.add.collider(this.player2, this.platforms);
-
         this.physics.add.collider(this.weapons, this.platforms);
 
         this.cursors = this.input.keyboard!.createCursorKeys();
@@ -184,11 +170,9 @@ export default class PlayScene extends Phaser.Scene {
                 this.killPlayer(2);
             }
         });
-
     }
 
     update() {
-
         if (this.isGameOver) return;
 
         const accel = 2500;
@@ -196,12 +180,10 @@ export default class PlayScene extends Phaser.Scene {
         const slideDrag = 300;
         const jumpForce = -550;
 
-        //Jugador 1
         if (!this.p1Status.isDead) {
             this.player1.updatePlayer(accel, normalDrag, slideDrag, jumpForce);
         }
 
-        //Jugador 2
         if (!this.p2Status.isDead) {
             this.player2.updatePlayer(accel, normalDrag, slideDrag, jumpForce);
         }
@@ -239,10 +221,10 @@ export default class PlayScene extends Phaser.Scene {
         }
 
         this.bullets.getChildren().forEach((b: any) => {
-        const distance = Math.abs(b.x - b.getData('originX'));
-        if (distance > b.getData('range')) {
-            b.destroy();
-        }
+            const distance = Math.abs(b.x - b.getData('originX'));
+            if (distance > b.getData('range')) {
+                b.destroy();
+            }
         });
 
         const midX = (this.player1.x + this.player2.x) / 2;
@@ -250,7 +232,6 @@ export default class PlayScene extends Phaser.Scene {
         this.cameraTarget.setPosition(midX, midY);
 
         const dist = Phaser.Math.Distance.Between(this.player1.x, this.player1.y, this.player2.x, this.player2.y);
-
         let zoom = 1000 / (dist + 500); 
         zoom = Phaser.Math.Clamp(zoom, 0.6, 1.3); 
         this.cameras.main.setZoom(zoom);
@@ -258,13 +239,9 @@ export default class PlayScene extends Phaser.Scene {
         const currentTime = this.time.now;
 
         this.spawners.forEach(spawner => {
-
             if (!spawner.isOccupied && currentTime > spawner.nextSpawnTime && this.weapons.getLength() < this.maxTotalWeapons) {
-            
                 const w = spawner.config;
-
                 const newWeapon = new Weapon(this, spawner.x, spawner.y, w.name, w.color, w.ammo, w.fireRate, w.speed, w.range);
-            
                 this.weapons.add(newWeapon);
                 spawner.activeWeapon = newWeapon;
                 spawner.isOccupied = true;
@@ -281,7 +258,6 @@ export default class PlayScene extends Phaser.Scene {
             const weapon = w as Weapon;
             if (!weapon.isEquipped && weapon.currentAmmo <= 0 && !weapon.getData('destroying')) {
                 weapon.setData('destroying', true);
-            
                 this.time.delayedCall(5000, () => {
                     if (!weapon.isEquipped) {
                         weapon.destroy();
@@ -291,13 +267,9 @@ export default class PlayScene extends Phaser.Scene {
                 });
             }
         });
-
     }
 
-    //Fin update
-
     private tryPickUpWeapon(player: Player, playerNum: number) {
-
         if (playerNum === 1 && this.p1Weapon) return;
         if (playerNum === 2 && this.p2Weapon) return;
 
@@ -305,7 +277,6 @@ export default class PlayScene extends Phaser.Scene {
             const weapon = w as Weapon;
 
             if (weapon.isEquipped) return;
-
             if (playerNum === 1 && this.p1Weapon) return;
             if (playerNum === 2 && this.p2Weapon) return;
 
@@ -315,11 +286,9 @@ export default class PlayScene extends Phaser.Scene {
 
             if (playerNum === 1) {
                 this.p1Weapon = weapon;
-                this.player1.setWeaponState(weapon.name); 
             }
             if (playerNum === 2) {
                 this.p2Weapon = weapon;
-                this.player2.setWeaponState(weapon.name); 
             }
         });
     }
@@ -330,18 +299,13 @@ export default class PlayScene extends Phaser.Scene {
         if (playerNum === 1 && this.p1Weapon) {
             weaponToDrop = this.p1Weapon;
             this.p1Weapon = null;
-            // NUEVO: Reseteamos la animación del jugador 1 a desarmado
-            this.player1.setWeaponState('unarmed'); 
         } else if (playerNum === 2 && this.p2Weapon) {
             weaponToDrop = this.p2Weapon;
             this.p2Weapon = null;
-            // NUEVO: Reseteamos la animación del jugador 2 a desarmado
-            this.player2.setWeaponState('unarmed'); 
         }
 
         if (weaponToDrop) {
             weaponToDrop.isEquipped = false;
-
             const body = weaponToDrop.body as Phaser.Physics.Arcade.Body;
             body.setEnable(true);
             body.setVelocityY(-200);
@@ -349,7 +313,6 @@ export default class PlayScene extends Phaser.Scene {
     }
 
     private tryShoot(weapon: Weapon, player: Player, facingRight: boolean, time: number, ownerNum: number) {
-        
         if (canShoot(time, weapon.lastFired, weapon.fireRate, weapon.currentAmmo, weapon.isEquipped)) {
             weapon.lastFired = time;
             weapon.currentAmmo--;
@@ -365,7 +328,6 @@ export default class PlayScene extends Phaser.Scene {
             
             bullet.setData('originX', bullet.x);
             bullet.setData('range', weapon.range);
-            
             bullet.setData('owner', ownerNum); 
         }
     }
@@ -468,5 +430,4 @@ export default class PlayScene extends Phaser.Scene {
         winText.setScrollFactor(0);
         winText.setDepth(100);
     }
-
 }

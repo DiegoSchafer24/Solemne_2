@@ -1,14 +1,12 @@
 import Phaser from 'phaser';
 import { calculateDrag, validateJump } from '../utils/physicsLogic';
-
-export const PLAYER_STATES = { IDLE: 0, WALK: 1, JUMP: 2, CROUCH: 3, DIE: 4, FALL: 5, SLIDE: 6 };
+export const PLAYER_STATES = { IDLE: 0, WALK: 1, JUMP: 2, CROUCH: 3, SLIDE: 4 };
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     public isDead: boolean = false;
     public facingRight: boolean = true;
     
     private currentState: number = PLAYER_STATES.IDLE;
-    private currentWeapon: string = 'unarmed';
     private controls: any;
     private canDoubleJump: boolean = true;
 
@@ -24,15 +22,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.body!.setOffset(4, 8);
         this.setDepth(10);
         this.setTint(playerColor);
-        this.play('idle-unarmed');
+        
+        this.play('idle');
     }
 
     updatePlayer(accel: number, normalDrag: number, slideDrag: number, jumpForce: number) {
-        if (this.isDead) {
-            this.currentState = PLAYER_STATES.DIE;
-            this.updateAnimation();
-            return;
-        }
+
+        if (this.isDead) return;
 
         const body = this.body as Phaser.Physics.Arcade.Body;
         body.setAccelerationX(0);
@@ -70,6 +66,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 body.setVelocityY(jumpForce);
                 if (jumpStatus.useDoubleJump) {
                     this.canDoubleJump = false;
+                    this.play('jump'); 
                 }
             }
         }
@@ -77,7 +74,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         const isActuallyMoving = Math.abs(body.velocity.x) > 5; 
 
         if (!body.touching.down) {
-            this.currentState = body.velocity.y < 0 ? PLAYER_STATES.JUMP : PLAYER_STATES.FALL;
+            this.currentState = PLAYER_STATES.JUMP; 
         } else if (isCrouching) {
             this.currentState = Math.abs(body.velocity.x) > 50 ? PLAYER_STATES.SLIDE : PLAYER_STATES.CROUCH;
             this.setScale(1, 0.5); 
@@ -94,27 +91,18 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.updateAnimation();
     }
 
-    setWeaponState(weaponName: string | null) {
-        if (weaponName === 'Pistola') this.currentWeapon = 'pistol';
-        else if (weaponName === 'Escopeta') this.currentWeapon = 'shotgun';
-        else this.currentWeapon = 'unarmed';
-        this.updateAnimation();
-    }
-
     private updateAnimation() {
-        const stateKeys = ['idle', 'walk', 'jump', 'crouch', 'die', 'fall', 'slide'];
-        const animToPlay = `${stateKeys[this.currentState]}-${this.currentWeapon}`;
+
+        const stateKeys = ['idle', 'walk', 'jump', 'crouch', 'crouch'];
+        const animToPlay = stateKeys[this.currentState];
         
         if (this.scene.anims.exists(animToPlay)) {
-
             if (!this.anims.currentAnim || this.anims.currentAnim.key !== animToPlay) {
                 this.play(animToPlay, true);
             }
         } else {
-
             this.stop(); 
-
-            const walkTextureKey = `player_walk_${this.currentWeapon}`;
+            const walkTextureKey = `player_${animToPlay}`;
             
             if (this.scene.textures.exists(walkTextureKey)) {
                 this.setTexture(walkTextureKey);
