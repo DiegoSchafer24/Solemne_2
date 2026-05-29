@@ -12,8 +12,8 @@ export default class PlayScene extends Phaser.Scene {
     private cameraTarget!: Phaser.GameObjects.Zone;
     private player1!: Player;
     private player2!: Player;
-    private p1Status = { isDead: false, isInvul: false, spawnX: 50, spawnY: 500 };
-    private p2Status = { isDead: false, isInvul: false, spawnX: 1230, spawnY: 500 };
+    private p1Status = { isDead: false, isInvul: false, spawnX: 100, spawnY: 600 };
+    private p2Status = { isDead: false, isInvul: false, spawnX: 1180, spawnY: 600 };
     private isGameOver: boolean = false;
     private pendingGameOver: boolean = false;
     private p1Color: number = 0xff0000;
@@ -62,8 +62,8 @@ export default class PlayScene extends Phaser.Scene {
         this.isGameOver = false;
         this.pendingGameOver = false;
         this.physics.world.resume();
-        this.p1Status = { isDead: false, isInvul: false, spawnX: 50, spawnY: 500 };
-        this.p2Status = { isDead: false, isInvul: false, spawnX: 1230, spawnY: 500 };
+        this.p1Status = { isDead: false, isInvul: false, spawnX: 100, spawnY: 500 };
+        this.p2Status = { isDead: false, isInvul: false, spawnX: 1180, spawnY: 500 };
         this.p1Weapon = null;
         this.p2Weapon = null;
 
@@ -78,10 +78,15 @@ export default class PlayScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.cameraTarget, false, 0.1, 0.1);
 
         const levelData = [
+
             { x: 640, y: 700, width: 1280, height: 200, texture: 'floor_tex' },
-            { x: 350, y: 480, width: 250, height: 20, texture: 'platform_tex' },  
-            { x: 930, y: 480, width: 250, height: 20, texture: 'platform_tex' },  
-            { x: 640, y: 280, width: 350, height: 20, texture: 'platform_tex' }  
+            { x: 640, y: 520, width: 350, height: 20, texture: 'platform_tex' },  
+            { x: 640, y: 320, width: 400, height: 20, texture: 'platform_tex' },  
+            { x: 200, y: 250, width: 250, height: 20, texture: 'platform_tex' },
+            { x: 1080, y: 250, width: 250, height: 20, texture: 'platform_tex' },
+            { x: 50, y: 440, width: 250, height: 20, texture: 'platform_tex' },
+            { x: 1240, y: 440, width: 250, height: 20, texture: 'platform_tex' },
+            { x: 640, y: 150, width: 350, height: 20, texture: 'platform_tex' }
         ];
 
         levelData.forEach(data => {
@@ -114,18 +119,24 @@ export default class PlayScene extends Phaser.Scene {
         
         this.spawners = [
             { 
-                x: 640, y: 400,
-                config: { name: 'pistol', texture: 'weapon_pistol', color: 0xffff00, ammo: 15, fireRate: 400, speed: 800, range: 1000 },
-                nextSpawnTime: 0,
-                isOccupied: false,
-                activeWeapon: null 
+                x: 200, y: 210, 
+                config: { name: 'shotgun', texture: 'weapon_shotgun', color: 0xffaa00, ammo: 5, fireRate: 1000, speed: 2500, range: 300 },
+                nextSpawnTime: 0, isOccupied: false, activeWeapon: null 
             },
             { 
-                x: 640, y: 200, 
+                x: 1080, y: 210, 
                 config: { name: 'shotgun', texture: 'weapon_shotgun', color: 0xffaa00, ammo: 5, fireRate: 1000, speed: 2500, range: 300 },
-                nextSpawnTime: 0,
-                isOccupied: false,
-                activeWeapon: null 
+                nextSpawnTime: 0, isOccupied: false, activeWeapon: null 
+            },
+            { 
+                x: 640, y: 280,
+                config: { name: 'pistol', texture: 'weapon_pistol', color: 0xffff00, ammo: 15, fireRate: 400, speed: 800, range: 1000 },
+                nextSpawnTime: 0, isOccupied: false, activeWeapon: null 
+            },
+            { 
+                x: 640, y: 480, 
+                config: { name: 'pistol', texture: 'weapon_pistol', color: 0xffff00, ammo: 15, fireRate: 400, speed: 800, range: 1000 },
+                nextSpawnTime: 0, isOccupied: false, activeWeapon: null 
             }
         ];
 
@@ -141,11 +152,11 @@ export default class PlayScene extends Phaser.Scene {
         this.cursors = this.input.keyboard!.createCursorKeys();
         this.wasd = this.input.keyboard!.addKeys('W,A,S,D');
 
-        this.player1 = new Player(this, 50, 500, 'player_idle', this.wasd, true, this.p1Color);
+        this.player1 = new Player(this, this.p1Status.spawnX, this.p1Status.spawnY, 'player_idle', this.wasd, true, this.p1Color);
         const body1 = this.player1.body as Phaser.Physics.Arcade.Body;
         body1.setMaxVelocity(400, 800);
 
-        this.player2 = new Player(this, 1230, 500, 'player_idle', this.cursors, false, this.p2Color);
+        this.player2 = new Player(this, this.p2Status.spawnX, this.p2Status.spawnY, 'player_idle', this.cursors, false, this.p2Color);
         const body2 = this.player2.body as Phaser.Physics.Arcade.Body;
         body2.setMaxVelocity(400, 800);
 

@@ -85,7 +85,7 @@ export default class CharacterSelectScene extends Phaser.Scene {
 
     private checkStart() {
         if (this.p1Ready && this.p2Ready) {
-            let finalP1Color = COLORS[this.p1Index].hex;
+            const finalP1Color = COLORS[this.p1Index].hex;
             let finalP2Color = COLORS[this.p2Index].hex;
 
             if (finalP1Color === finalP2Color) {
