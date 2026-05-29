@@ -3,6 +3,7 @@ import { onMounted, onUnmounted } from 'vue';
 import Phaser from 'phaser';
 import PlayScene from '../game/scenes/PlayScene';
 import MainMenuScene from '../game/scenes/MainMenuScene';
+import CharacterSelectScene from '../game/scenes/CharacterSelectScene';
 import { uiState } from '../state/uiState';
 
 let game: Phaser.Game | null = null;
@@ -24,7 +25,7 @@ onMounted(() => {
         debug: true //Permite ver las hitboxes
       }
     },
-    scene: [MainMenuScene, PlayScene]
+    scene: [MainMenuScene, CharacterSelectScene, PlayScene]
   };
 
   game = new Phaser.Game(config);

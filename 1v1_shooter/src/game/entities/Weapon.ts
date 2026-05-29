@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-export default class Weapon extends Phaser.GameObjects.Rectangle {
+export default class Weapon extends Phaser.Physics.Arcade.Sprite {
   public name: string;
   public maxAmmo: number;
   public currentAmmo: number;
@@ -9,12 +9,14 @@ export default class Weapon extends Phaser.GameObjects.Rectangle {
   public range: number;
   public isEquipped: boolean = false;
   public lastFired: number = 0;
+  public bulletColor: number;
 
   constructor(
     scene: Phaser.Scene,
     x: number,
     y: number,
     name: string,
+    textureKey: string,
     color: number,
     maxAmmo: number,
     fireRate: number,
@@ -22,9 +24,10 @@ export default class Weapon extends Phaser.GameObjects.Rectangle {
     range: number
   ) {
 
-    super(scene, x, y, 30, 15, color);
+    super(scene, x, y, textureKey);
 
     this.name = name;
+    this.bulletColor = color; 
     this.maxAmmo = maxAmmo;
     this.currentAmmo = maxAmmo;
     this.fireRate = fireRate;

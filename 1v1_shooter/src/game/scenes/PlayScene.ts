@@ -10,17 +10,16 @@ export default class PlayScene extends Phaser.Scene {
 
     private platforms!: Phaser.Physics.Arcade.StaticGroup;
     private cameraTarget!: Phaser.GameObjects.Zone;
-
     private player1!: Player;
     private player2!: Player;
     private p1Status = { isDead: false, isInvul: false, spawnX: 50, spawnY: 500 };
     private p2Status = { isDead: false, isInvul: false, spawnX: 1230, spawnY: 500 };
     private isGameOver: boolean = false;
     private pendingGameOver: boolean = false;
-
+    private p1Color: number = 0xff0000;
+    private p2Color: number = 0x0000ff;
     private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
     private wasd!: any;
-
     private weapons!: Phaser.Physics.Arcade.Group;
     private p1Weapon: Weapon | null = null;
     private p2Weapon: Weapon | null = null;
@@ -36,10 +35,19 @@ export default class PlayScene extends Phaser.Scene {
         super({ key: 'PlayScene' });
     }
 
+    init(data: any) {
+        if (data.p1Color !== undefined) this.p1Color = data.p1Color;
+        if (data.p2Color !== undefined) this.p2Color = data.p2Color;
+        uiState.p1.color = '#' + this.p1Color.toString(16).padStart(6, '0');
+        uiState.p2.color = '#' + this.p2Color.toString(16).padStart(6, '0');
+    }
+
     preload() {
         this.load.image('bg', '/assets/background.jpg');
         this.load.image('floor_tex', '/assets/floor_tex.png');
         this.load.image('platform_tex', '/assets/platform_tex.png');
+        this.load.image('weapon_pistol', '/assets/weapons/pistol.png');
+        this.load.image('weapon_shotgun', '/assets/weapons/shotgun.png');
         
         const frameConf = { frameWidth: 32, frameHeight: 48 };
         this.load.spritesheet('player_idle', '/assets/characters/player_idle.png', frameConf);
@@ -50,6 +58,15 @@ export default class PlayScene extends Phaser.Scene {
     }
 
     create() {
+
+        this.isGameOver = false;
+        this.pendingGameOver = false;
+        this.physics.world.resume();
+        this.p1Status = { isDead: false, isInvul: false, spawnX: 50, spawnY: 500 };
+        this.p2Status = { isDead: false, isInvul: false, spawnX: 1230, spawnY: 500 };
+        this.p1Weapon = null;
+        this.p2Weapon = null;
+
         const bg = this.add.image(640, 360, 'bg').setDepth(-100);
         bg.setScrollFactor(0);
         bg.setScale(1.7);
@@ -98,19 +115,20 @@ export default class PlayScene extends Phaser.Scene {
         this.spawners = [
             { 
                 x: 640, y: 400,
-                config: { name: 'Pistola', color: 0xffff00, ammo: 15, fireRate: 400, speed: 800, range: 1000 },
+                config: { name: 'pistol', texture: 'weapon_pistol', color: 0xffff00, ammo: 15, fireRate: 400, speed: 800, range: 1000 },
                 nextSpawnTime: 0,
                 isOccupied: false,
                 activeWeapon: null 
             },
             { 
                 x: 640, y: 200, 
-                config: { name: 'Escopeta', color: 0xffaa00, ammo: 5, fireRate: 1000, speed: 2500, range: 300 },
+                config: { name: 'shotgun', texture: 'weapon_shotgun', color: 0xffaa00, ammo: 5, fireRate: 1000, speed: 2500, range: 300 },
                 nextSpawnTime: 0,
                 isOccupied: false,
                 activeWeapon: null 
             }
         ];
+
         this.bullets = this.physics.add.group({
             allowGravity: false
         });
@@ -123,11 +141,11 @@ export default class PlayScene extends Phaser.Scene {
         this.cursors = this.input.keyboard!.createCursorKeys();
         this.wasd = this.input.keyboard!.addKeys('W,A,S,D');
 
-        this.player1 = new Player(this, 50, 500, 'player_idle', this.wasd, true, 0xff0000);
+        this.player1 = new Player(this, 50, 500, 'player_idle', this.wasd, true, this.p1Color);
         const body1 = this.player1.body as Phaser.Physics.Arcade.Body;
         body1.setMaxVelocity(400, 800);
 
-        this.player2 = new Player(this, 1230, 500, 'player_idle', this.cursors, false, 0x0000ff);
+        this.player2 = new Player(this, 1230, 500, 'player_idle', this.cursors, false, this.p2Color);
         const body2 = this.player2.body as Phaser.Physics.Arcade.Body;
         body2.setMaxVelocity(400, 800);
 
@@ -203,11 +221,23 @@ export default class PlayScene extends Phaser.Scene {
         }
 
         if (this.p1Weapon) {
-            this.p1Weapon.setPosition(this.player1.x, this.player1.y - 15);
+            const offsetX = this.player1.flipX ? -12 : 12; 
+            const isP1Crouching = this.player1.anims.currentAnim?.key === 'crouch';
+            const offsetY = isP1Crouching ? -5 : -20; 
+            
+            this.p1Weapon.setPosition(this.player1.x + offsetX, this.player1.y + offsetY);
+            this.p1Weapon.setFlipX(this.player1.flipX);
+            this.p1Weapon.setDepth(11);
         }
 
         if (this.p2Weapon) {
-            this.p2Weapon.setPosition(this.player2.x, this.player2.y - 15);
+            const offsetX = this.player2.flipX ? -12 : 12;
+            const isP2Crouching = this.player2.anims.currentAnim?.key === 'crouch';
+            const offsetY = isP2Crouching ? -5 : -20;
+            
+            this.p2Weapon.setPosition(this.player2.x + offsetX, this.player2.y + offsetY);
+            this.p2Weapon.setFlipX(this.player2.flipX);
+            this.p2Weapon.setDepth(11);
         }
 
         const time = this.time.now;
@@ -241,7 +271,7 @@ export default class PlayScene extends Phaser.Scene {
         this.spawners.forEach(spawner => {
             if (!spawner.isOccupied && currentTime > spawner.nextSpawnTime && this.weapons.getLength() < this.maxTotalWeapons) {
                 const w = spawner.config;
-                const newWeapon = new Weapon(this, spawner.x, spawner.y, w.name, w.color, w.ammo, w.fireRate, w.speed, w.range);
+                const newWeapon = new Weapon(this, spawner.x, spawner.y, w.name, w.texture, w.color, w.ammo, w.fireRate, w.speed, w.range);
                 this.weapons.add(newWeapon);
                 spawner.activeWeapon = newWeapon;
                 spawner.isOccupied = true;
@@ -318,17 +348,19 @@ export default class PlayScene extends Phaser.Scene {
             weapon.currentAmmo--;
 
             const offsetX = facingRight ? 25 : -25;
-            const bullet = this.add.rectangle(player.x + offsetX, player.y - 15, 15, 5, weapon.fillColor);
-            
+            const isCrouching = player.anims.currentAnim?.key === 'crouch';
+            const spawnY = isCrouching ? player.y - 8 : player.y - 25;
+            const bullet = this.add.rectangle(player.x + offsetX, spawnY, 15, 5, weapon.bulletColor);
+
             this.physics.add.existing(bullet);
             this.bullets.add(bullet);
-            
+
             const body = bullet.body as Phaser.Physics.Arcade.Body;
-            body.setVelocityX(facingRight ? weapon.bulletSpeed : -weapon.bulletSpeed); 
-            
+            body.setVelocityX(facingRight ? weapon.bulletSpeed : -weapon.bulletSpeed);
+            body.setSize(60, 15);
             bullet.setData('originX', bullet.x);
             bullet.setData('range', weapon.range);
-            bullet.setData('owner', ownerNum); 
+            bullet.setData('owner', ownerNum);
         }
     }
 
@@ -415,19 +447,65 @@ export default class PlayScene extends Phaser.Scene {
         this.cameras.main.zoomTo(1.8, 1000, 'Power2');
 
         const textStr = winnerNum === 0 ? 'Tie!' : `Player ${winnerNum} wins!`;
-        const textColor = winnerNum === 0 ? '#ffffff' : (winnerNum === 1 ? '#ff0000' : '#0000ff');
+        
+        let textColor = '#ffffff'; 
+        if (winnerNum === 1) {
+            textColor = '#' + this.p1Color.toString(16).padStart(6, '0');
+        } else if (winnerNum === 2) {
+            textColor = '#' + this.p2Color.toString(16).padStart(6, '0');
+        }
         
         const winText = this.add.text(640, 360, textStr, {
-            fontSize: '45px', 
+            fontSize: '30px', 
+            fontFamily: '"Press Start 2P", monospace',
             color: textColor, 
-            fontStyle: 'bold',
             backgroundColor: '#000000aa',
-            padding: { x: 30, y: 15 },
+            padding: { x: 30, y: 20 },
             align: 'center'
         });
         
         winText.setOrigin(0.5);
         winText.setScrollFactor(0);
         winText.setDepth(100);
+
+        this.time.delayedCall(1000, () => {
+            const btnStyle = {
+                fontSize: '20px',
+                fontFamily: '"Press Start 2P", monospace',
+                color: '#ffffff',
+                backgroundColor: '#333333aa',
+                padding: { x: 20, y: 15 }
+            };
+
+            const rematchBtn = this.add.text(640, 440, 'REVANCHA', btnStyle)
+                .setOrigin(0.5)
+                .setScrollFactor(0)
+                .setDepth(100)
+                .setInteractive({ useHandCursor: true });
+
+            rematchBtn.on('pointerover', () => rematchBtn.setColor('#00ff00'));
+            rematchBtn.on('pointerout', () => rematchBtn.setColor('#ffffff'));
+            rematchBtn.on('pointerdown', () => {
+
+                uiState.p1.lives = 3;
+                uiState.p2.lives = 3;
+                this.scene.restart({ p1Color: this.p1Color, p2Color: this.p2Color });
+            });
+
+            const menuBtn = this.add.text(640, 500, 'MENÚ', btnStyle)
+                .setOrigin(0.5)
+                .setScrollFactor(0)
+                .setDepth(100)
+                .setInteractive({ useHandCursor: true });
+
+            menuBtn.on('pointerover', () => menuBtn.setColor('#ff0000'));
+            menuBtn.on('pointerout', () => menuBtn.setColor('#ffffff'));
+            menuBtn.on('pointerdown', () => {
+
+                uiState.p1.lives = 3;
+                uiState.p2.lives = 3;
+                this.scene.start('MainMenuScene');
+            });
+        });
     }
 }

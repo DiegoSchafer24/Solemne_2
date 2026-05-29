@@ -20,7 +20,6 @@ export default class MainMenuScene extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
 
-        // Fondo animado
         if (this.textures.exists('menu_background')) {
             const imgHeight = this.textures.get('menu_background').get().height;
             const scale = height / imgHeight;
@@ -61,7 +60,7 @@ export default class MainMenuScene extends Phaser.Scene {
             playBtnText.setScale(playBtnText.scaleX * 0.9);
             
             setTimeout(() => {
-                this.scene.start('PlayScene');
+                this.scene.start('CharacterSelectScene');
             }, 100); 
         });
     }
