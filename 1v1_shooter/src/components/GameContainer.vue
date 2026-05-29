@@ -22,7 +22,7 @@ onMounted(() => {
       default: 'arcade',
       arcade: {
         gravity: { y: 1200, x: 0 },
-        debug: true //Permite ver las hitboxes
+        debug: false
       }
     },
     scene: [MainMenuScene, CharacterSelectScene, PlayScene]
