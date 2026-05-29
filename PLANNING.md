@@ -40,8 +40,9 @@
 - [x] Crear las visuales para el escenario.
 - [x] Crear las visuales para las armas.
 - [x] Crear las animaciones para los personajes y lograr implementarlas correctamente.
-- [ ] Creación de audio (música y efectos de sonido).
-- [x] Creación de menú principal
+- [x] Creación de efectos de sonido.
+- [ ] Creación de música.
+- [x] Creación de menú principal.
 - [x] Creación de skins seleccionable para los personajes.
 - [x] Creación de pantalla para seleccionar skins de personaje.
 - [x] Creación de pantalla de victoria al finalizar la partida

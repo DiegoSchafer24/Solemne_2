@@ -55,6 +55,9 @@ export default class PlayScene extends Phaser.Scene {
         this.load.spritesheet('player_jump', '/assets/characters/player_jump.png', frameConf);
         this.load.spritesheet('player_crouch', '/assets/characters/player_crouch.png', frameConf);
         this.load.spritesheet('player_slide', '/assets/characters/player_slide.png', frameConf);
+
+        this.load.audio('sfx_pistol', '/assets/sounds/pistol.wav');
+        this.load.audio('sfx_shotgun', '/assets/sounds/shotgun.wav');
     }
 
     create() {
@@ -357,6 +360,12 @@ export default class PlayScene extends Phaser.Scene {
         if (canShoot(time, weapon.lastFired, weapon.fireRate, weapon.currentAmmo, weapon.isEquipped)) {
             weapon.lastFired = time;
             weapon.currentAmmo--;
+
+            if (weapon.name === 'pistol') {
+                this.sound.play('sfx_pistol', { volume: 0.5 });
+            } else if (weapon.name === 'shotgun') {
+                this.sound.play('sfx_shotgun', { volume: 0.5 });
+            }
 
             const offsetX = facingRight ? 25 : -25;
             const isCrouching = player.anims.currentAnim?.key === 'crouch';
