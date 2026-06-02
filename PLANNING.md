@@ -46,3 +46,20 @@
 - [x] Creación de skins seleccionable para los personajes.
 - [x] Creación de pantalla para seleccionar skins de personaje.
 - [x] Creación de pantalla de victoria al finalizar la partida
+
+<h1>MEJORAS</h1>
+
+- [ ] Mejorar consistencia tamaño personajes
+- [ ] Mejorar animaciones de personaje
+- [ ] Añadir personajes distintos
+- [ ] Añadir distintas plataformas
+- [ ] Añadir mas escenarios con distintas tematicas
+- [ ] Añadir mas elementos ineteractivos para los escenarios
+- [ ] Mejorar diseño de plataformas
+- [ ] Añadir plataformas moviles
+- [ ] Añadir mecanicas para tirar armas
+- [ ] Añadir mas puntos de respawn aleatorios
+- [ ] Añadir indicador de balas
+- [ ] Añadir efectos visuales
+- [ ] Añadir mas efectos de sonido
+- [ ] Añadir musica (gameplays y menus)
