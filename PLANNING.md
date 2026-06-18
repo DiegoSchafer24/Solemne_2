@@ -1,3 +1,7 @@
+# SOLEMNE 2
+
+---
+
 # Semana 1
 ## Tareas planificadas
 
@@ -55,34 +59,15 @@ ___
 
 ***
 
-# Planning sección 2
-
----
-
-## MEJORAS
-
-- [ ] Mejorar consistencia tamaño personajes
-- [ ] Mejorar animaciones de personaje
-- [ ] Añadir personajes distintos
-- [ ] Añadir distintas plataformas
-- [ ] Añadir mas escenarios con distintas tematicas
-- [ ] Añadir mas elementos ineteractivos para los escenarios
-- [ ] Mejorar diseño de plataformas
-- [ ] Añadir plataformas moviles
-- [ ] Añadir mecanicas para tirar armas
-- [ ] Añadir mas puntos de respawn aleatorios
-- [ ] Añadir indicador de balas
-- [ ] Añadir efectos visuales
-- [ ] Añadir mas efectos de sonido
-- [ ] Añadir musica (gameplays y menus)
+# SOLEMNE 3
 
 ---
 
 # Semana 1
 
 - [x] Atualizar el PLANNING.md
-- [ ] Actualizar el DESIGN.md
-- [ ] Inicio de desarrollo del backend
+- [x] Actualizar el DESIGN.md
+- [x] Inicio de desarrollo del backend
 - [ ] Conexión a MongoDB como base de datos
 - [ ] Agregar opciónes de registro de usuario y configuraciónes
 - [ ] Integración con servicio externo (REST)
