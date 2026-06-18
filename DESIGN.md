@@ -38,66 +38,34 @@ Es un framework "Opensource" y altamente documentado, por lo que a la hora de in
 
 Solemne_2/  
 ├── .github/  
-│   └── workflows/  
-│       └── main.yml                 #Configuración de GitHub Actions (CI/CD)  
+│   └── workflows/                   #Configuración de GitHub Actions (CI/CD)  
 ├── Img_DSG/                         #Carpeta que contiene mockups y bocetos  
 ├── 1v1_shooter/                     #Carpeta principal del juego  
 │   ├── public/  
-│   ├── src/                         #Código fuente  
-│   │   ├── assets/                  #Recursos de Vue  
-│   │   ├── components/              #Componentes reactivos de Vue UI  
-│   │   │   └── GameContainer.vue    #Contenedor que monta el canvas de Phaser  
-│   │   ├── game/                    #Ecosistema exclusivo del motor Phaser  
-│   │   │   ├── entities/            #Carpeta para clases de Jugadores/Balas  
-│   │   │   │   └── Weapon.ts        #Clases con rango y velocidad de armas  
-│   │   │   └── scenes/  
-│   │   │   │   └── PlayScene.ts     #Lógica del juego, suelo, plataformas  
-│   │   │   └── utils/  
-│   │   │       ├── gameLogic.ts     #Logica de condiciones de victoria/empate  
-│   │   │       ├── physicsLogic.ts  #Logica de físicas y movimiento  
-│   │   │       ├── weaponLogic.ts   #Lógica de disparo  
-│   │   │       └── playerLogic.ts   #Lógica de daño a jugadores  
-│   │   ├── state/                   #Directorio de estado global  
-│   │   │   └── uiState.ts           #Puente reactivo entre Vue y Phaser para manejar la UI (Vidas y colores)  
-│   │   ├── tests/                   #Pruebas unitarias  
-│   │   │   ├── gameLogic.test.ts    #Pruebas unitarias de condiciones de victoria/empate  
-│   │   │   ├── physicsLogic.test.ts #Pruebas unitarias de físicas y movimiento  
-│   │   │   ├── weaponLogic.test.ts  #Pruebas unitarias de armas  
-│   │   │   └── playerLogic.test.ts  #Pruebas unitarias de daño a jugadores  
-│   │   ├── App.vue                  #Componente raíz de la interfaz Vue  
-│   │   ├── main.ts                  #Punto de arranque de Vue  
-│   │   └── style.css                #Estilos globales de la página  
-├── backend/                         #API REST Node + Express + TypeScript  
-│   ├── src/  
-│   │   ├── config/                  #Conexion a MongoDB  
-│   │   ├── controllers/             #Controladores REST  
-│   │   ├── middlewares/             #Manejo de errores, 404, auth  
-│   │   ├── models/                  #Modelos Mongoose  
-│   │   ├── routes/                  #Rutas REST  
-│   │   ├── schemas/                 #Validaciones Zod  
-│   │   ├── services/                #Logica de negocio  
-│   │   └── utils/                   #Utilidades compartidas  
-│   ├── package.json  
-│   ├── tsconfig.json  
-│   ├── .env.example  
-│   ├── Dockerfile                   #Configuración multi-etapa para contenerizar la aplicación web en Docker  
-│   ├── eslint.config.js             #Configuración para el linter  
-│   ├── index.html                   #HTML base donde se inyecta Vite y Vue  
-│   ├── package.json                 #Dependencias (Vue, Phaser, Vitest, ESLint) y scripts (dev, build, lint, test)  
-│   ├── pnpm-lock.yaml               #Archivo de bloqueo generado por el gestor de paquetes pnpm  
-│   ├── tsconfig.app.json            #Configuración de TypeScript para el código de tu juego y frontend (Phaser/Vue)  
-│   ├── tsconfig.json                #Archivo principal que agrupa y coordina las configuraciones de TypeScript (app y node)  
-│   ├── tsconfig.node.json           #Configuración de TypeScript para los archivos de configuración del entorno (como vite.config.ts)  
-│   └── vite.config.ts               #Configuración del empaquetador Vite  
-├── .gitattributes                   #Archivo que previene errores por inconsistencias en saltos de linea  
-├── .gitignore                       #Archivo para excluir archivos innecesarios  
-├── DESIGN.md                        #Documento de diseño inicial con especificaciones y descripción del juego  
-├── PLANNING.md                      #Planificación del proyecto con objetivos semanales  
-└── README.md                        #Archivo con título, descripción e instrucciones de ejecución local y Docker  
+│   └── src/                         #Código fuente  
+│       ├── assets/                  #Recursos de Vue  
+│       ├── components/              #Componentes reactivos de Vue UI  
+│       ├── game/                    #Ecosistema exclusivo del motor Phaser  
+│       │   ├── entities/            #Carpeta para clases de Jugadores/Balas  
+│       │   ├── scenes/              #Carpeta para las escenas (Menú, selección de personaje, gameplay)  
+│       │   └── utils/               #Carpeta con la logica de jugadores, armas, etc.  
+│       ├── state/                   #Directorio de estado global  
+│       └── tests/                   #Pruebas unitarias de la lógica (carpeta utils)  
+└── backend/                         #API REST Node + Express + TypeScript  
+    └── src/  
+        ├── config/                  #Conexion a MongoDB  
+        ├── controllers/             #Controladores REST  
+        ├── middlewares/             #Manejo de errores, 404, auth  
+        ├── models/                  #Modelos Mongoose  
+        ├── routes/                  #Rutas REST  
+        ├── schemas/                 #Validaciones de datos de la API  
+        ├── services/                #Logica de negocio  
+        └── utils/                   #Utilidades compartidas  
+
 
 ---
 
-## Dependencias principaleS  
+## Dependencias principales  
 Las principales dependencias a ser instaladas utilizando pnpm seran: Vue, Phaser, Typescript, Vite, Vitest, Prettier.  
 
 ---
