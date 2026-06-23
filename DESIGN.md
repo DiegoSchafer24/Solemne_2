@@ -4,22 +4,22 @@
 
 # Mockups  
 Boceto a mano pantalla de titulo  
-![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Img_DSG/boceto_titulo.jpeg)  
+![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Imagenes_conceptos_DESIGN/boceto_titulo.jpeg)  
 
 Boceto a mano gameplay  
-![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Img_DSG/boceto_gameplay.jpeg)  
+![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Imagenes_conceptos_DESIGN/boceto_gameplay.jpeg)  
 
 Concepto digital pantalla de titulo  
-![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Img_DSG/concepto_titulo.png)  
+![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Imagenes_conceptos_DESIGN/concepto_titulo.png)  
 
 Concepto digital gameplay (1)  
-![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Img_DSG/gameplay(1).png)  
+![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Imagenes_conceptos_DESIGN/gameplay(1).png)  
 
 Concepto digital gameplay (2)  
-![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Img_DSG/gameplay(2).png)  
+![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Imagenes_conceptos_DESIGN/gameplay(2).png)  
 
 Concepto digital gameplay (3)  
-![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Img_DSG/gameplay(3).png)  
+![image alt](https://github.com/DiegoSchafer24/Solemne_2/blob/0d94fd08e91b1b2d03eff7194ba0ec7b7fbbac40/Imagenes_conceptos_DESIGN/gameplay(3).png)  
 
 ---
 
@@ -39,8 +39,8 @@ Es un framework "Opensource" y altamente documentado, por lo que a la hora de in
 Solemne_2/  
 ├── .github/  
 │   └── workflows/                   #Configuración de GitHub Actions (CI/CD)  
-├── Img_DSG/                         #Carpeta que contiene mockups y bocetos  
-├── 1v1_shooter/                     #Carpeta principal del juego  
+├── Imagenes_conceptos_DESIGN/                         #Carpeta que contiene mockups y bocetos  
+├── frontend/                        #Carpeta principal del juego (visuales y gameplay)  
 │   ├── public/  
 │   └── src/                         #Código fuente  
 │       ├── assets/                  #Recursos de Vue  
@@ -85,7 +85,7 @@ El proyecto evoluciona desde un juego local 1v1 desarrollado con Vue, Phaser y V
 
 ## Frontend
 
-El frontend se mantiene en la carpeta `1v1_shooter/` y conserva la estructura Vue + Phaser. Vue se encarga de la interfaz, menus, HUD y futuras pantallas de login/perfil. Phaser gestiona la logica visual e interactiva del juego.
+El frontend se encuentra en la carpeta `frontend/`, con una estructura Vue + Phaser. Vue se encarga de la interfaz, menus, HUD y futuras pantallas de login/perfil. Phaser gestiona la logica visual e interactiva del juego.
 
 ## Backend
 

@@ -10,7 +10,7 @@ jobs:
     
     defaults:
       run:
-        working-directory: ./1v1_shooter
+        working-directory: ./frontend
 
     steps:
       - name: Checkout del código
@@ -44,6 +44,6 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./1v1_shooter
+          context: ./frontend
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/shooter-1v1-web:latest
