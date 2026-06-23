@@ -68,7 +68,7 @@ ___
 - [x] Atualizar el PLANNING.md
 - [x] Actualizar el DESIGN.md
 - [x] Inicio de desarrollo del backend
-- [ ] Conexión a MongoDB como base de datos
+- [x] Conexión a MongoDB como base de datos
 - [ ] Agregar opciónes de registro de usuario y configuraciónes
 - [ ] Integración con servicio externo (REST)
 
