@@ -6,6 +6,11 @@ import { uiState } from '../../state/uiState';
 import { checkWinner } from '../utils/gameLogic';
 import Player from '../entities/Player';
 
+type SpawnPoint = {
+    x: number;
+    y: number;
+};
+
 export default class PlayScene extends Phaser.Scene {
 
     private platforms!: Phaser.Physics.Arcade.StaticGroup;
@@ -28,7 +33,10 @@ export default class PlayScene extends Phaser.Scene {
     private bullets!: Phaser.Physics.Arcade.Group;
     private p1Shoot!: Phaser.Input.Keyboard.Key;
     private p2Shoot!: Phaser.Input.Keyboard.Key;
+    private p1AmmoText!: Phaser.GameObjects.Text;
+    private p2AmmoText!: Phaser.GameObjects.Text;
     private spawners: any[] = [];
+    private respawnPoints: SpawnPoint[] = [];
     private maxTotalWeapons: number = 10;
 
     constructor() {
@@ -91,6 +99,8 @@ export default class PlayScene extends Phaser.Scene {
             { x: 1240, y: 440, width: 250, height: 20, texture: 'platform_tex' },
             { x: 640, y: 150, width: 350, height: 20, texture: 'platform_tex' }
         ];
+
+        this.respawnPoints = this.createRespawnPoints(levelData);
 
         levelData.forEach(data => {
             const platformElement = this.add.tileSprite(data.x, data.y, data.width, data.height, data.texture);
@@ -162,6 +172,9 @@ export default class PlayScene extends Phaser.Scene {
         this.player2 = new Player(this, this.p2Status.spawnX, this.p2Status.spawnY, 'player_idle', this.cursors, false, this.p2Color);
         const body2 = this.player2.body as Phaser.Physics.Arcade.Body;
         body2.setMaxVelocity(400, 800);
+
+        this.p1AmmoText = this.createAmmoText();
+        this.p2AmmoText = this.createAmmoText();
 
         this.physics.add.collider(this.player1, this.platforms);
         this.physics.add.collider(this.player2, this.platforms);
@@ -235,9 +248,9 @@ export default class PlayScene extends Phaser.Scene {
         }
 
         if (this.p1Weapon) {
-            const offsetX = this.player1.flipX ? -12 : 12; 
+            const offsetX = this.player1.flipX ? -18 : 18; 
             const isP1Crouching = this.player1.anims.currentAnim?.key === 'crouch';
-            const offsetY = isP1Crouching ? -5 : -20; 
+            const offsetY = isP1Crouching ? -8 : -30; 
             
             this.p1Weapon.setPosition(this.player1.x + offsetX, this.player1.y + offsetY);
             this.p1Weapon.setFlipX(this.player1.flipX);
@@ -245,9 +258,9 @@ export default class PlayScene extends Phaser.Scene {
         }
 
         if (this.p2Weapon) {
-            const offsetX = this.player2.flipX ? -12 : 12;
+            const offsetX = this.player2.flipX ? -18 : 18;
             const isP2Crouching = this.player2.anims.currentAnim?.key === 'crouch';
-            const offsetY = isP2Crouching ? -5 : -20;
+            const offsetY = isP2Crouching ? -8 : -30;
             
             this.p2Weapon.setPosition(this.player2.x + offsetX, this.player2.y + offsetY);
             this.p2Weapon.setFlipX(this.player2.flipX);
@@ -270,6 +283,9 @@ export default class PlayScene extends Phaser.Scene {
                 b.destroy();
             }
         });
+
+        this.updateAmmoIndicator(this.player1, this.p1Weapon, this.p1AmmoText);
+        this.updateAmmoIndicator(this.player2, this.p2Weapon, this.p2AmmoText);
 
         const midX = (this.player1.x + this.player2.x) / 2;
         const midY = (this.player1.y + this.player2.y) / 2;
@@ -311,6 +327,47 @@ export default class PlayScene extends Phaser.Scene {
                 });
             }
         });
+    }
+
+    private createRespawnPoints(levelData: Array<{ x: number, y: number, height: number }>): SpawnPoint[] {
+        const platformSpawnOffset = 10;
+        const platformSpawnPoints = levelData.map(data => ({
+            x: data.x,
+            y: data.y - (data.height / 2) - platformSpawnOffset
+        }));
+
+        return [
+            { x: this.p1Status.spawnX, y: this.p1Status.spawnY },
+            { x: this.p2Status.spawnX, y: this.p2Status.spawnY },
+            ...platformSpawnPoints
+        ];
+    }
+
+    private getRandomRespawnPoint(): SpawnPoint {
+        return Phaser.Utils.Array.GetRandom(this.respawnPoints);
+    }
+
+    private createAmmoText(): Phaser.GameObjects.Text {
+        return this.add.text(0, 0, '', {
+            fontSize: '18px',
+            fontFamily: '"Press Start 2P", monospace',
+            color: '#ffff00'
+        })
+            .setOrigin(0.5)
+            .setDepth(30)
+            .setVisible(false);
+    }
+
+    private updateAmmoIndicator(player: Player, weapon: Weapon | null, ammoText: Phaser.GameObjects.Text) {
+        if (!weapon || !player.visible) {
+            ammoText.setVisible(false);
+            return;
+        }
+
+        ammoText.setText(weapon.currentAmmo.toString());
+        ammoText.setColor(weapon.currentAmmo <= 0 ? '#ff0000' : '#ffff00');
+        ammoText.setPosition(player.x, player.y - player.displayHeight - 12);
+        ammoText.setVisible(true);
     }
 
     private tryPickUpWeapon(player: Player, playerNum: number) {
@@ -367,9 +424,9 @@ export default class PlayScene extends Phaser.Scene {
                 this.sound.play('sfx_shotgun', { volume: 0.5 });
             }
 
-            const offsetX = facingRight ? 25 : -25;
+            const offsetX = facingRight ? 38 : -38;
             const isCrouching = player.anims.currentAnim?.key === 'crouch';
-            const spawnY = isCrouching ? player.y - 8 : player.y - 25;
+            const spawnY = isCrouching ? player.y - 12 : player.y - 38;
             const bullet = this.add.rectangle(player.x + offsetX, spawnY, 15, 5, weapon.bulletColor);
 
             this.physics.add.existing(bullet);
@@ -417,7 +474,11 @@ export default class PlayScene extends Phaser.Scene {
         (player.body as Phaser.Physics.Arcade.Body).setEnable(false); 
 
         this.time.delayedCall(3000, () => {
-            player.setPosition(status.spawnX, status.spawnY);
+            const respawnPoint = this.getRandomRespawnPoint();
+            status.spawnX = respawnPoint.x;
+            status.spawnY = respawnPoint.y;
+
+            player.setPosition(respawnPoint.x, respawnPoint.y);
             player.setVisible(true);
             
             const body = player.body as Phaser.Physics.Arcade.Body;
@@ -446,6 +507,8 @@ export default class PlayScene extends Phaser.Scene {
     private endGame(winnerNum: number) {
         this.isGameOver = true;
         this.physics.pause();
+        this.p1AmmoText.setVisible(false);
+        this.p2AmmoText.setVisible(false);
 
         let targetX = 640;
         let targetY = 360;
@@ -466,7 +529,7 @@ export default class PlayScene extends Phaser.Scene {
         this.cameras.main.pan(targetX, targetY, 1000, 'Power2');
         this.cameras.main.zoomTo(1.8, 1000, 'Power2');
 
-        const textStr = winnerNum === 0 ? 'Tie!' : `Player ${winnerNum} wins!`;
+        const textStr = winnerNum === 0 ? 'Tie!' : `JUGADOR ${winnerNum} GANA!`;
         
         let textColor = '#ffffff'; 
         if (winnerNum === 1) {

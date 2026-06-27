@@ -77,12 +77,12 @@ ___
 # Semana 2
 
 - [ ] Inicio de implementación de jugabilidad online
-- [ ] Mejorar consistencia tamaño personajes
+- [x] Mejorar consistencia tamaño personajes
 - [ ] Mejorar animaciones de personaje
 - [ ] Añadir personajes distintos
 - [ ] Añadir mecanicas para tirar armas
 - [ ] Añadir mas puntos de respawn aleatorios
-- [ ] Añadir indicador de balas
+- [x] Añadir indicador de balas
 
 ***
 

@@ -22,7 +22,7 @@ onMounted(() => {
       default: 'arcade',
       arcade: {
         gravity: { y: 1200, x: 0 },
-        debug: false
+        debug: true
       }
     },
     scene: [MainMenuScene, CharacterSelectScene, PlayScene]

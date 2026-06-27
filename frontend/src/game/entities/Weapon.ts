@@ -37,6 +37,7 @@ export default class Weapon extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     this.setDepth(20);
+    this.setScale(1.5);
 
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setDragX(100);

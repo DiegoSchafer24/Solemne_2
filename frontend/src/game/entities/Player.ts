@@ -41,10 +41,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         body.setDragX(calculateDrag(isCrouching, body.velocity.x, normalDrag, slideDrag));
 
         if (isCrouching) {
-            this.setScale(1, 0.5);
+            this.setScale(1.5, 1.5);
             this.currentState = PLAYER_STATES.CROUCH;
         } else {
-            this.setScale(1, 1);
+            this.setScale(1.5, 1.5);
             if (leftDown) {
                 body.setAccelerationX(-accel);
                 this.facingRight = false;
@@ -77,11 +77,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.currentState = PLAYER_STATES.JUMP; 
         } else if (isCrouching) {
             this.currentState = Math.abs(body.velocity.x) > 50 ? PLAYER_STATES.SLIDE : PLAYER_STATES.CROUCH;
-            this.setScale(1, 0.5); 
+            this.setScale(1.5, 1.5); 
             body.setSize(24, 20, false); 
             body.setOffset(4, 28); 
         } else {
-            this.setScale(1, 1); 
+            this.setScale(1.5, 1.5); 
             body.setSize(24, 40, false); 
             body.setOffset(4, 8);
 
