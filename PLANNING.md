@@ -81,7 +81,7 @@ ___
 - [ ] Mejorar animaciones de personaje
 - [ ] Añadir personajes distintos
 - [ ] Añadir mecanicas para tirar armas
-- [ ] Añadir mas puntos de respawn aleatorios
+- [X] Añadir mas puntos de respawn aleatorios
 - [x] Añadir indicador de balas
 
 ***
