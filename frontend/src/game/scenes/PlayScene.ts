@@ -4,7 +4,8 @@ import Weapon from '../entities/Weapon';
 import { canShoot } from '../utils/weaponLogic';
 import { uiState } from '../../state/uiState';
 import { checkWinner } from '../utils/gameLogic';
-import Player from '../entities/Player';
+import Player, { type RuntimePlayerControls } from '../entities/Player';
+import { controlState } from './controlState';
 
 type SpawnPoint = {
     x: number;
@@ -23,16 +24,12 @@ export default class PlayScene extends Phaser.Scene {
     private pendingGameOver: boolean = false;
     private p1Color: number = 0xff0000;
     private p2Color: number = 0x0000ff;
-    private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-    private wasd!: any;
+    private p1Controls!: RuntimePlayerControls;
+    private p2Controls!: RuntimePlayerControls;
     private weapons!: Phaser.Physics.Arcade.Group;
     private p1Weapon: Weapon | null = null;
     private p2Weapon: Weapon | null = null;
-    private p1Interact!: { E: Phaser.Input.Keyboard.Key, Q: Phaser.Input.Keyboard.Key };
-    private p2Interact!: { PICK: Phaser.Input.Keyboard.Key, DROP: Phaser.Input.Keyboard.Key };
     private bullets!: Phaser.Physics.Arcade.Group;
-    private p1Shoot!: Phaser.Input.Keyboard.Key;
-    private p2Shoot!: Phaser.Input.Keyboard.Key;
     private p1AmmoText!: Phaser.GameObjects.Text;
     private p2AmmoText!: Phaser.GameObjects.Text;
     private spawners: any[] = [];
@@ -115,7 +112,7 @@ export default class PlayScene extends Phaser.Scene {
         
         states.forEach(s => {
             const spriteKey = `player_${s}`;
-            if (this.textures.exists(spriteKey)) { 
+            if (this.textures.exists(spriteKey)) {
                 this.anims.create({
                     key: s,
                     frames: this.anims.generateFrameNumbers(spriteKey, { start: 0 }),
@@ -159,17 +156,14 @@ export default class PlayScene extends Phaser.Scene {
         this.physics.add.collider(this.bullets, this.platforms, (bullet) => {
             bullet.destroy();
         });
-        this.p1Shoot = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-        this.p2Shoot = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.MINUS);
+        this.p1Controls = this.input.keyboard!.addKeys(controlState.player1) as RuntimePlayerControls;
+        this.p2Controls = this.input.keyboard!.addKeys(controlState.player2) as RuntimePlayerControls;
 
-        this.cursors = this.input.keyboard!.createCursorKeys();
-        this.wasd = this.input.keyboard!.addKeys('W,A,S,D');
-
-        this.player1 = new Player(this, this.p1Status.spawnX, this.p1Status.spawnY, 'player_idle', this.wasd, true, this.p1Color);
+        this.player1 = new Player(this, this.p1Status.spawnX, this.p1Status.spawnY, 'player_idle', this.p1Controls, true, this.p1Color);
         const body1 = this.player1.body as Phaser.Physics.Arcade.Body;
         body1.setMaxVelocity(400, 800);
 
-        this.player2 = new Player(this, this.p2Status.spawnX, this.p2Status.spawnY, 'player_idle', this.cursors, false, this.p2Color);
+        this.player2 = new Player(this, this.p2Status.spawnX, this.p2Status.spawnY, 'player_idle', this.p2Controls, false, this.p2Color);
         const body2 = this.player2.body as Phaser.Physics.Arcade.Body;
         body2.setMaxVelocity(400, 800);
 
@@ -179,15 +173,6 @@ export default class PlayScene extends Phaser.Scene {
         this.physics.add.collider(this.player1, this.platforms);
         this.physics.add.collider(this.player2, this.platforms);
         this.physics.add.collider(this.weapons, this.platforms);
-
-        this.cursors = this.input.keyboard!.createCursorKeys();
-        this.wasd = this.input.keyboard!.addKeys('W,A,S,D');
-
-        this.p1Interact = this.input.keyboard!.addKeys('E,Q') as any;
-        this.p2Interact = {
-            PICK: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.PERIOD),
-            DROP: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.COMMA)
-        };
 
         const deathZone = this.add.rectangle(640, 1300, 4000, 100, 0xff0000, 0);
         this.physics.add.existing(deathZone, true);
@@ -233,24 +218,24 @@ export default class PlayScene extends Phaser.Scene {
             this.player2.updatePlayer(accel, normalDrag, slideDrag, jumpForce);
         }
 
-        if (Phaser.Input.Keyboard.JustDown(this.p1Interact.E)) {
+        if (Phaser.Input.Keyboard.JustDown(this.p1Controls.take)) {
             this.tryPickUpWeapon(this.player1, 1);
         }
-        if (Phaser.Input.Keyboard.JustDown(this.p1Interact.Q)) {
+        if (Phaser.Input.Keyboard.JustDown(this.p1Controls.drop)) {
             this.dropWeapon(1);
         }
 
-        if (Phaser.Input.Keyboard.JustDown(this.p2Interact.PICK)) {
+        if (Phaser.Input.Keyboard.JustDown(this.p2Controls.take)) {
             this.tryPickUpWeapon(this.player2, 2);
         }
-        if (Phaser.Input.Keyboard.JustDown(this.p2Interact.DROP)) {
+        if (Phaser.Input.Keyboard.JustDown(this.p2Controls.drop)) {
             this.dropWeapon(2);
         }
 
         if (this.p1Weapon) {
-            const offsetX = this.player1.flipX ? -18 : 18; 
+            const offsetX = this.player1.flipX ? -18 : 18;
             const isP1Crouching = this.player1.anims.currentAnim?.key === 'crouch';
-            const offsetY = isP1Crouching ? -8 : -30; 
+            const offsetY = isP1Crouching ? -8 : -30;
             
             this.p1Weapon.setPosition(this.player1.x + offsetX, this.player1.y + offsetY);
             this.p1Weapon.setFlipX(this.player1.flipX);
@@ -269,11 +254,11 @@ export default class PlayScene extends Phaser.Scene {
 
         const time = this.time.now;
 
-        if (this.p1Shoot.isDown && this.p1Weapon) {
+        if (this.p1Controls.shoot.isDown && this.p1Weapon) {
             this.tryShoot(this.p1Weapon, this.player1, this.player1.facingRight, time, 1);
         }
 
-        if (this.p2Shoot.isDown && this.p2Weapon) {
+        if (this.p2Controls.shoot.isDown && this.p2Weapon) {
             this.tryShoot(this.p2Weapon, this.player2, this.player2.facingRight, time, 2);
         }
 
@@ -292,8 +277,8 @@ export default class PlayScene extends Phaser.Scene {
         this.cameraTarget.setPosition(midX, midY);
 
         const dist = Phaser.Math.Distance.Between(this.player1.x, this.player1.y, this.player2.x, this.player2.y);
-        let zoom = 1000 / (dist + 500); 
-        zoom = Phaser.Math.Clamp(zoom, 0.6, 1.3); 
+        let zoom = 1000 / (dist + 500);
+        zoom = Phaser.Math.Clamp(zoom, 0.6, 1.3);
         this.cameras.main.setZoom(zoom);
 
         const currentTime = this.time.now;
@@ -310,7 +295,7 @@ export default class PlayScene extends Phaser.Scene {
             if (spawner.isOccupied && spawner.activeWeapon && spawner.activeWeapon.isEquipped) {
                 spawner.isOccupied = false;
                 spawner.activeWeapon = null;
-                spawner.nextSpawnTime = currentTime + 5000; 
+                spawner.nextSpawnTime = currentTime + 5000;
             }
         });
 
@@ -453,7 +438,7 @@ export default class PlayScene extends Phaser.Scene {
 
         if (uiState.p1.lives <= 0 || uiState.p2.lives <= 0) {
             if (!this.pendingGameOver) {
-                this.pendingGameOver = true; 
+                this.pendingGameOver = true;
 
                 this.time.delayedCall(100, () => {
                     const winner = checkWinner(uiState.p1.lives, uiState.p2.lives);
@@ -463,15 +448,15 @@ export default class PlayScene extends Phaser.Scene {
                 });
             }
 
-            this.dropWeapon(playerNum); 
-            player.setVisible(false); 
-            (player.body as Phaser.Physics.Arcade.Body).setEnable(false); 
-            return; 
+            this.dropWeapon(playerNum);
+            player.setVisible(false);
+            (player.body as Phaser.Physics.Arcade.Body).setEnable(false);
+            return;
         }
         
-        this.dropWeapon(playerNum); 
-        player.setVisible(false); 
-        (player.body as Phaser.Physics.Arcade.Body).setEnable(false); 
+        this.dropWeapon(playerNum);
+        player.setVisible(false);
+        (player.body as Phaser.Physics.Arcade.Body).setEnable(false);
 
         this.time.delayedCall(3000, () => {
             const respawnPoint = this.getRandomRespawnPoint();
@@ -499,7 +484,7 @@ export default class PlayScene extends Phaser.Scene {
             this.time.delayedCall(2000, () => {
                 status.isInvul = false;
                 blink.stop();
-                player.setAlpha(1); 
+                player.setAlpha(1);
             });
         });
     }
@@ -513,7 +498,7 @@ export default class PlayScene extends Phaser.Scene {
         let targetX = 640;
         let targetY = 360;
 
-        if (winnerNum !== 0) { 
+        if (winnerNum !== 0) {
             const winnerPlayer = winnerNum === 1 ? this.player1 : this.player2;
             const loserPlayer = winnerNum === 1 ? this.player2 : this.player1;
             loserPlayer.setVisible(false);
@@ -525,13 +510,13 @@ export default class PlayScene extends Phaser.Scene {
             this.player2.setVisible(false);
         }
 
-        this.cameras.main.stopFollow(); 
+        this.cameras.main.stopFollow();
         this.cameras.main.pan(targetX, targetY, 1000, 'Power2');
         this.cameras.main.zoomTo(1.8, 1000, 'Power2');
 
         const textStr = winnerNum === 0 ? 'Tie!' : `JUGADOR ${winnerNum} GANA!`;
         
-        let textColor = '#ffffff'; 
+        let textColor = '#ffffff';
         if (winnerNum === 1) {
             textColor = '#' + this.p1Color.toString(16).padStart(6, '0');
         } else if (winnerNum === 2) {
@@ -539,9 +524,9 @@ export default class PlayScene extends Phaser.Scene {
         }
         
         const winText = this.add.text(640, 360, textStr, {
-            fontSize: '30px', 
+            fontSize: '30px',
             fontFamily: '"Press Start 2P", monospace',
-            color: textColor, 
+            color: textColor,
             backgroundColor: '#000000aa',
             padding: { x: 30, y: 20 },
             align: 'center'

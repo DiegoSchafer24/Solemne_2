@@ -1,23 +1,29 @@
 import Phaser from 'phaser';
 import { calculateDrag, validateJump } from '../utils/physicsLogic';
+import type { ControlActions } from '../scenes/controlState';
+
 export const PLAYER_STATES = { IDLE: 0, WALK: 1, JUMP: 2, CROUCH: 3, SLIDE: 4 };
+
+export type RuntimePlayerControls = {
+    [key in ControlActions]: Phaser.Input.Keyboard.Key;
+};
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     public isDead: boolean = false;
     public facingRight: boolean = true;
     
     private currentState: number = PLAYER_STATES.IDLE;
-    private controls: any;
+    private controls: RuntimePlayerControls;
     private canDoubleJump: boolean = true;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, textureKey: string, controls: any, facingRight: boolean, playerColor: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number, textureKey: string, controls: RuntimePlayerControls, facingRight: boolean, playerColor: number) {
         super(scene, x, y, textureKey);
         this.controls = controls;
         this.facingRight = facingRight;
         this.setOrigin(0.5, 1);
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        this.setCollideWorldBounds(false); 
+        this.setCollideWorldBounds(false);
         this.body!.setSize(24, 40, false);
         this.body!.setOffset(4, 8);
         this.setDepth(10);
@@ -33,10 +39,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         const body = this.body as Phaser.Physics.Arcade.Body;
         body.setAccelerationX(0);
 
-        const isCrouching = this.controls.S ? this.controls.S.isDown : this.controls.down.isDown;
-        const leftDown = this.controls.A ? this.controls.A.isDown : this.controls.left.isDown;
-        const rightDown = this.controls.D ? this.controls.D.isDown : this.controls.right.isDown;
-        const upJustDown = this.controls.W ? Phaser.Input.Keyboard.JustDown(this.controls.W) : Phaser.Input.Keyboard.JustDown(this.controls.up);
+        const isCrouching = this.controls.down.isDown;
+        const leftDown = this.controls.left.isDown;
+        const rightDown = this.controls.right.isDown;
+        const upJustDown = Phaser.Input.Keyboard.JustDown(this.controls.up);
 
         body.setDragX(calculateDrag(isCrouching, body.velocity.x, normalDrag, slideDrag));
 
@@ -66,7 +72,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 body.setVelocityY(jumpForce);
                 if (jumpStatus.useDoubleJump) {
                     this.canDoubleJump = false;
-                    this.play('jump'); 
+                    this.play('jump');
                 }
             }
         }
@@ -74,14 +80,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         const isActuallyMoving = Math.abs(body.velocity.x) > 5; 
 
         if (!body.touching.down) {
-            this.currentState = PLAYER_STATES.JUMP; 
+            this.currentState = PLAYER_STATES.JUMP;
         } else if (isCrouching) {
             this.currentState = Math.abs(body.velocity.x) > 50 ? PLAYER_STATES.SLIDE : PLAYER_STATES.CROUCH;
-            this.setScale(1.5, 1.5); 
-            body.setSize(24, 20, false); 
-            body.setOffset(4, 28); 
+            this.setScale(1.5, 1.5);
+            body.setSize(24, 20, false);
+            body.setOffset(4, 28);
         } else {
-            this.setScale(1.5, 1.5); 
+            this.setScale(1.5, 1.5);
             body.setSize(24, 40, false); 
             body.setOffset(4, 8);
 
@@ -101,7 +107,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.play(animToPlay, true);
             }
         } else {
-            this.stop(); 
+            this.stop();
             const walkTextureKey = `player_${animToPlay}`;
             
             if (this.scene.textures.exists(walkTextureKey)) {

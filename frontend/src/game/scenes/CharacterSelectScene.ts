@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { controlState, getControlName } from './controlState';
+import type { RuntimePlayerControls } from '../entities/Player';
 
 const COLORS = [
     { name: 'Rojo', hex: 0xff0000 },
@@ -14,6 +16,8 @@ const COLORS = [
 export default class CharacterSelectScene extends Phaser.Scene {
     private p1Index: number = 0;
     private p2Index: number = 1;
+    private readonly backButtonScale = 2;
+    private readonly backButtonHitSize = 72;
 
     private p1Sprite!: Phaser.GameObjects.Sprite;
     private p2Sprite!: Phaser.GameObjects.Sprite;
@@ -30,6 +34,7 @@ export default class CharacterSelectScene extends Phaser.Scene {
     preload() {
         const frameConf = { frameWidth: 32, frameHeight: 48 };
         this.load.spritesheet('player_idle', '/assets/characters/player_idle.png', frameConf);
+        this.load.image('back_button', '/assets/back.png');
     }
 
     create() {
@@ -41,19 +46,26 @@ export default class CharacterSelectScene extends Phaser.Scene {
         this.input.keyboard!.removeAllListeners();
         
         const width = this.cameras.main.width;
+        this.createBackButton();
 
         this.add.text(width / 2, 100, 'SELECCIÓN DE COLOR', {
             fontSize: '30px', fontFamily: '"Press Start 2P", monospace', color: '#ffffff'
         }).setOrigin(0.5);
 
-        this.add.text(width / 4, 200, 'JUGADOR 1\n(A / D cambiar)\n(W confirmar)', {
+        const p1LeftKey = getControlName(controlState.player1.left);
+        const p1RightKey = getControlName(controlState.player1.right);
+        const p1ConfirmKey = getControlName(controlState.player1.up);
+        this.add.text(width / 4, 200, `JUGADOR 1\n(${p1LeftKey} / ${p1RightKey} cambiar)\n(${p1ConfirmKey} confirmar)`, {
             fontSize: '15px', fontFamily: '"Press Start 2P", monospace', align: 'center'
         }).setOrigin(0.5);
 
         this.p1Sprite = this.add.sprite(width / 4, 350, 'player_idle').setScale(4);
         this.p1Text = this.add.text(width / 4, 450, '', { fontSize: '20px', fontFamily: '"Press Start 2P", monospace' }).setOrigin(0.5);
 
-        this.add.text((width / 4) * 3, 200, 'JUGADOR 2\n(← / → cambiar)\n(↑ confirmar)', {
+        const p2LeftKey = getControlName(controlState.player2.left);
+        const p2RightKey = getControlName(controlState.player2.right);
+        const p2ConfirmKey = getControlName(controlState.player2.up);
+        this.add.text((width / 4) * 3, 200, `JUGADOR 2\n(${p2LeftKey} / ${p2RightKey} cambiar)\n(${p2ConfirmKey} confirmar)`, {
             fontSize: '15px', fontFamily: '"Press Start 2P", monospace', align: 'center'
         }).setOrigin(0.5);
 
@@ -63,13 +75,55 @@ export default class CharacterSelectScene extends Phaser.Scene {
 
         this.updateSelections();
 
-        this.input.keyboard!.on('keydown-A', () => { if (!this.p1Ready) { this.p1Index = (this.p1Index - 1 + COLORS.length) % COLORS.length; this.updateSelections(); }});
-        this.input.keyboard!.on('keydown-D', () => { if (!this.p1Ready) { this.p1Index = (this.p1Index + 1) % COLORS.length; this.updateSelections(); }});
-        this.input.keyboard!.on('keydown-W', () => { this.p1Ready = true; this.p1Text.setColor('#00ff00'); this.checkStart(); });
+        const p1Controls = this.input.keyboard!.addKeys(controlState.player1) as RuntimePlayerControls;
+        const p2Controls = this.input.keyboard!.addKeys(controlState.player2) as RuntimePlayerControls;
 
-        this.input.keyboard!.on('keydown-LEFT', () => { if (!this.p2Ready) { this.p2Index = (this.p2Index - 1 + COLORS.length) % COLORS.length; this.updateSelections(); }});
-        this.input.keyboard!.on('keydown-RIGHT', () => { if (!this.p2Ready) { this.p2Index = (this.p2Index + 1) % COLORS.length; this.updateSelections(); }});
-        this.input.keyboard!.on('keydown-UP', () => { this.p2Ready = true; this.p2Text.setColor('#00ff00'); this.checkStart(); });
+        p1Controls.left.on('down', () => { if (!this.p1Ready) { this.p1Index = (this.p1Index - 1 + COLORS.length) % COLORS.length; this.updateSelections(); }});
+        p1Controls.right.on('down', () => { if (!this.p1Ready) { this.p1Index = (this.p1Index + 1) % COLORS.length; this.updateSelections(); }});
+        p1Controls.up.on('down', () => { this.p1Ready = true; this.p1Text.setColor('#00ff00'); this.checkStart(); });
+
+        p2Controls.left.on('down', () => { if (!this.p2Ready) { this.p2Index = (this.p2Index - 1 + COLORS.length) % COLORS.length; this.updateSelections(); }});
+        p2Controls.right.on('down', () => { if (!this.p2Ready) { this.p2Index = (this.p2Index + 1) % COLORS.length; this.updateSelections(); }});
+        p2Controls.up.on('down', () => { this.p2Ready = true; this.p2Text.setColor('#00ff00'); this.checkStart(); });
+
+        this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
+            this.input.keyboard!.off('keydown');
+            for (const key in p1Controls) { p1Controls[key as keyof RuntimePlayerControls].removeAllListeners(); }
+            for (const key in p2Controls) { p2Controls[key as keyof RuntimePlayerControls].removeAllListeners(); }
+        });
+    }
+
+    private createBackButton() {
+        const backButton = this.add.image(42, 42, 'back_button')
+            .setOrigin(0.5)
+            .setScale(this.backButtonScale);
+
+        this.setCenteredHitArea(backButton, this.backButtonHitSize, this.backButtonHitSize);
+
+        backButton.on('pointerover', () => {
+            backButton.setTint(0xdddddd);
+        });
+
+        backButton.on('pointerout', () => {
+            backButton.clearTint();
+        });
+
+        backButton.on('pointerdown', () => {
+            this.scene.start('MainMenuScene', { initialMenu: 'local' });
+        });
+    }
+
+    private setCenteredHitArea(image: Phaser.GameObjects.Image, width: number, height: number) {
+        image.setInteractive(
+            new Phaser.Geom.Rectangle(
+                image.width / 2 - width / (2 * image.scaleX),
+                image.height / 2 - height / (2 * image.scaleY),
+                width / image.scaleX,
+                height / image.scaleY
+            ),
+            Phaser.Geom.Rectangle.Contains
+        );
+        image.input!.cursor = 'pointer';
     }
 
     private updateSelections() {
