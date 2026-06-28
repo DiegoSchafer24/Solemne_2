@@ -6,10 +6,13 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "test:online-rest": "tsx scripts/test-online-rest.ts"
   },
   "dependencies": {
+    "@colyseus/schema": "^4.0.27",
     "bcryptjs": "^3.0.3",
+    "colyseus": "^0.17.10",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
