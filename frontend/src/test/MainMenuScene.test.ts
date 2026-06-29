@@ -11,7 +11,11 @@ const mockGameObject = {
     on: vi.fn().mockReturnThis(),
     setTint: vi.fn().mockReturnThis(),
     clearTint: vi.fn().mockReturnThis(),
-    scaleX: 1
+    scaleX: 1,
+    setVisible: vi.fn().mockReturnThis(),
+    destroy: vi.fn(),
+    input: { cursor: '' },
+    setText: vi.fn().mockReturnThis()
 };
 
 describe('MainMenuScene', () => {

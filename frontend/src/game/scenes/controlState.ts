@@ -1,7 +1,7 @@
 import { reactive } from 'vue';
 import Phaser from 'phaser';
 
-export type ControlActions = 'up' | 'down' | 'left' | 'right' | 'shoot' | 'take' | 'drop';
+export type ControlActions = 'up' | 'down' | 'left' | 'right' | 'shoot' | 'interact';
 
 export interface PlayerControls {
     up: number;
@@ -9,8 +9,7 @@ export interface PlayerControls {
     left: number;
     right: number;
     shoot: number;
-    take: number;
-    drop: number;
+    interact: number;
 }
 
 const defaultControls: { player1: PlayerControls, player2: PlayerControls, online: PlayerControls } = {
@@ -19,27 +18,24 @@ const defaultControls: { player1: PlayerControls, player2: PlayerControls, onlin
         down: Phaser.Input.Keyboard.KeyCodes.S,
         left: Phaser.Input.Keyboard.KeyCodes.A,
         right: Phaser.Input.Keyboard.KeyCodes.D,
-        shoot: Phaser.Input.Keyboard.KeyCodes.SPACE,
-        take: Phaser.Input.Keyboard.KeyCodes.E,
-        drop: Phaser.Input.Keyboard.KeyCodes.Q
+        shoot: Phaser.Input.Keyboard.KeyCodes.C,
+        interact: Phaser.Input.Keyboard.KeyCodes.V
     },
     player2: {
-        up: Phaser.Input.Keyboard.KeyCodes.UP,
-        down: Phaser.Input.Keyboard.KeyCodes.DOWN,
-        left: Phaser.Input.Keyboard.KeyCodes.LEFT,
-        right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
-        shoot: Phaser.Input.Keyboard.KeyCodes.MINUS,
-        take: Phaser.Input.Keyboard.KeyCodes.PERIOD,
-        drop: Phaser.Input.Keyboard.KeyCodes.COMMA
+        up: Phaser.Input.Keyboard.KeyCodes.I,
+        down: Phaser.Input.Keyboard.KeyCodes.K,
+        left: Phaser.Input.Keyboard.KeyCodes.J,
+        right: Phaser.Input.Keyboard.KeyCodes.L,
+        shoot: Phaser.Input.Keyboard.KeyCodes.PERIOD,
+        interact: Phaser.Input.Keyboard.KeyCodes.MINUS
     },
     online: {
         up: Phaser.Input.Keyboard.KeyCodes.W,
         down: Phaser.Input.Keyboard.KeyCodes.S,
         left: Phaser.Input.Keyboard.KeyCodes.A,
         right: Phaser.Input.Keyboard.KeyCodes.D,
-        shoot: Phaser.Input.Keyboard.KeyCodes.SPACE,
-        take: Phaser.Input.Keyboard.KeyCodes.E,
-        drop: Phaser.Input.Keyboard.KeyCodes.Q
+        shoot: Phaser.Input.Keyboard.KeyCodes.J,
+        interact: Phaser.Input.Keyboard.KeyCodes.K
     }
 };
 

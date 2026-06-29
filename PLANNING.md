@@ -80,8 +80,8 @@ ___
 - [x] Mejorar consistencia tamaño personajes
 - [ ] Mejorar animaciones de personaje
 - [ ] Añadir personajes distintos
-- [ ] Añadir mecanicas para tirar armas
-- [X] Añadir mas puntos de respawn aleatorios
+- [x] Añadir mecanicas para tirar armas
+- [x] Añadir mas puntos de respawn aleatorios
 - [x] Añadir indicador de balas
 
 ***

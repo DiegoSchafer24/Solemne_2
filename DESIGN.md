@@ -38,31 +38,30 @@ Es un framework "Opensource" y altamente documentado, por lo que a la hora de in
 
 Solemne_2/  
 ├── .github/  
-│   └── workflows/                   # Configuración de GitHub Actions (CI/CD)
-├── Imagenes_conceptos_DESIGN/       # Carpeta que contiene mockups y bocetos
-├── frontend/                        # Carpeta principal del juego (visuales y gameplay)
-│   ├── public/                      # Recursos estáticos (imágenes, sonidos) que se sirven directamente
-│   └── src/                         # Código fuente de la aplicación Vue y Phaser
-│       ├── assets/                  # Recursos de Vue procesados por Vite (CSS, etc.)
-│       ├── components/              # Componentes de la interfaz de usuario de Vue (.vue)
-│       ├── game/                    # Lógica principal del juego gestionada por Phaser
-│       │   ├── entities/            # Clases para entidades del juego (Jugador, Bala, etc.)
-│       │   ├── scenes/              # Escenas del juego (Menú, Partida, etc.)
-│       │   └── utils/               # Funciones de utilidad para la lógica del juego
-│       ├── state/                   # Estado global reactivo de la aplicación
-│       └── test/                    # Pruebas unitarias con Vitest
-└── backend/                         # API REST con Node.js, Express y TypeScript
+│   └── workflows/                   # Configuración de GitHub Actions (CI/CD)  
+├── Imagenes_conceptos_DESIGN/       # Carpeta que contiene mockups y bocetos  
+├── frontend/                        # Carpeta principal del juego (visuales y gameplay)  
+│   ├── public/                      # Recursos estáticos (imágenes, sonidos) que se sirven directamente  
+│   └── src/                         # Código fuente de la aplicación Vue y Phaser  
+│       ├── assets/                  # Recursos de Vue procesados por Vite (CSS, etc.)  
+│       ├── components/              # Componentes de la interfaz de usuario de Vue (.vue)  
+│       ├── game/                    # Lógica principal del juego gestionada por Phaser  
+│       │   ├── entities/            # Clases para entidades del juego (Jugador, Bala, etc.)  
+│       │   ├── scenes/              # Escenas del juego (Menú, Partida, etc.)  
+│       │   └── utils/               # Funciones de utilidad para la lógica del juego  
+│       ├── state/                   # Estado global reactivo de la aplicación  
+│       └── test/                    # Pruebas unitarias con Vitest  
+└── backend/                         # API REST con Node.js, Express y TypeScript  
     └── src/  
-        ├── config/                  # Configuración de la aplicación (ej. conexión a DB)
-        ├── controllers/             # Lógica que maneja las peticiones y respuestas HTTP
-        ├── middlewares/             # Funciones que se ejecutan antes de los controladores (auth, errores)
-        ├── models/                  # Esquemas y modelos de la base de datos (Mongoose)
-        ├── routes/                  # Definición de los endpoints de la API
-        ├── schemas/                 # Esquemas de validación de datos (Zod)
-        ├── services/                # Lógica de negocio principal de la aplicación
-        ├── types/                   # Definiciones de tipos e interfaces de TypeScript
-        └── utils/                   # Funciones de utilidad compartidas en el backend
-
+        ├── config/                  # Configuración de la aplicación (ej. conexión a DB)  
+        ├── controllers/             # Lógica que maneja las peticiones y respuestas HTTP  
+        ├── middlewares/             # Funciones que se ejecutan antes de los controladores (auth, errores)  
+        ├── models/                  # Esquemas y modelos de la base de datos (Mongoose)  
+        ├── routes/                  # Definición de los endpoints de la API  
+        ├── schemas/                 # Esquemas de validación de datos (Zod)  
+        ├── services/                # Lógica de negocio principal de la aplicación  
+        ├── types/                   # Definiciones de tipos e interfaces de TypeScript  
+        └── utils/                   # Funciones de utilidad compartidas en el backend  
 
 ---
 

@@ -176,8 +176,7 @@ export default class MainMenuScene extends Phaser.Scene {
             left: 'IZQUIERDA',
             right: 'DERECHA',
             shoot: 'DISPARAR',
-            take: 'TOMAR ARMA',
-            drop: 'SOLTAR ARMA'
+            interact: 'TOMAR/SOLTAR'
         };
 
         let yOffset = y;

@@ -4,6 +4,7 @@ dist-ssr/
 .vite/
 coverage/
 .eslintcache
+*.tsbuildinfo
 logs
 *.log
 npm-debug.log*

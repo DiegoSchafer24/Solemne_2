@@ -172,7 +172,34 @@ export default class PlayScene extends Phaser.Scene {
 
         this.physics.add.collider(this.player1, this.platforms);
         this.physics.add.collider(this.player2, this.platforms);
-        this.physics.add.collider(this.weapons, this.platforms);
+        this.physics.add.collider(this.weapons, this.platforms, (weaponObject, _platformObject) => {
+            const weapon = weaponObject as Weapon;
+            const body = weapon.body as Phaser.Physics.Arcade.Body;
+
+            // Un arma lanzada que golpea una plataforma deja de ser peligrosa
+            if (weapon.getData('thrownBy')) {
+                weapon.setData('thrownBy', null);
+            }
+
+            if (body.touching.down && !weapon.getData('isSettling')) {
+                weapon.setData('isSettling', true);
+
+                body.setAngularVelocity(0);
+
+                const targetAngle = Math.abs(weapon.angle) < 90 ? 0 : 180;
+
+                this.tweens.add({
+                    targets: weapon,
+                    angle: targetAngle,
+                    duration: 150,
+                    ease: 'Cubic.easeOut'
+                });
+
+                body.setDragX(800);
+                
+                body.setBounceY(0.1);
+            }
+        });
 
         const deathZone = this.add.rectangle(640, 1300, 4000, 100, 0xff0000, 0);
         this.physics.add.existing(deathZone, true);
@@ -183,6 +210,10 @@ export default class PlayScene extends Phaser.Scene {
 
         this.physics.add.overlap(this.player2, deathZone, () => {
             this.killPlayer(2, true);
+        });
+
+        this.physics.add.overlap(deathZone, this.weapons, (_zone, weaponObject) => {
+            (weaponObject as Weapon).destroy();
         });
 
         this.physics.add.overlap(this.bullets, this.player1, (_player, b) => {
@@ -199,6 +230,13 @@ export default class PlayScene extends Phaser.Scene {
                 bullet.destroy();
                 this.killPlayer(2);
             }
+        });
+
+        this.physics.add.overlap(this.player1, this.weapons, (p, w) => {
+            this.handleWeaponCollision(p as Player, 1, w as Weapon);
+        });
+        this.physics.add.overlap(this.player2, this.weapons, (p, w) => {
+            this.handleWeaponCollision(p as Player, 2, w as Weapon);
         });
     }
 
@@ -218,24 +256,25 @@ export default class PlayScene extends Phaser.Scene {
             this.player2.updatePlayer(accel, normalDrag, slideDrag, jumpForce);
         }
 
-        if (Phaser.Input.Keyboard.JustDown(this.p1Controls.take)) {
-            this.tryPickUpWeapon(this.player1, 1);
+        if (Phaser.Input.Keyboard.JustDown(this.p1Controls.interact)) {
+            if (this.p1Weapon) {
+                this.dropWeapon(this.player1, 1);
+            } else {
+                this.tryPickUpWeapon(this.player1, 1);
+            }
         }
-        if (Phaser.Input.Keyboard.JustDown(this.p1Controls.drop)) {
-            this.dropWeapon(1);
-        }
-
-        if (Phaser.Input.Keyboard.JustDown(this.p2Controls.take)) {
-            this.tryPickUpWeapon(this.player2, 2);
-        }
-        if (Phaser.Input.Keyboard.JustDown(this.p2Controls.drop)) {
-            this.dropWeapon(2);
+        if (Phaser.Input.Keyboard.JustDown(this.p2Controls.interact)) {
+            if (this.p2Weapon) {
+                this.dropWeapon(this.player2, 2);
+            } else {
+                this.tryPickUpWeapon(this.player2, 2);
+            }
         }
 
         if (this.p1Weapon) {
             const offsetX = this.player1.flipX ? -18 : 18;
             const isP1Crouching = this.player1.anims.currentAnim?.key === 'crouch';
-            const offsetY = isP1Crouching ? -8 : -30;
+            const offsetY = isP1Crouching ? -20 : -30;
             
             this.p1Weapon.setPosition(this.player1.x + offsetX, this.player1.y + offsetY);
             this.p1Weapon.setFlipX(this.player1.flipX);
@@ -245,7 +284,7 @@ export default class PlayScene extends Phaser.Scene {
         if (this.p2Weapon) {
             const offsetX = this.player2.flipX ? -18 : 18;
             const isP2Crouching = this.player2.anims.currentAnim?.key === 'crouch';
-            const offsetY = isP2Crouching ? -8 : -30;
+            const offsetY = isP2Crouching ? -20 : -30;
             
             this.p2Weapon.setPosition(this.player2.x + offsetX, this.player2.y + offsetY);
             this.p2Weapon.setFlipX(this.player2.flipX);
@@ -301,6 +340,18 @@ export default class PlayScene extends Phaser.Scene {
 
         this.weapons.getChildren().forEach((w: any) => {
             const weapon = w as Weapon;
+            const body = weapon.body as Phaser.Physics.Arcade.Body;
+
+            if (body) {
+                // Restablece el estado de "asentamiento" y la fricción si el arma está en el aire
+                if (!body.touching.down && weapon.getData('isSettling')) {
+                    weapon.setData('isSettling', false);
+                    
+                    // Restablece una fricción baja para la resistencia del aire
+                    body.setDragX(100); 
+                }
+            }
+
             if (!weapon.isEquipped && weapon.currentAmmo <= 0 && !weapon.getData('destroying')) {
                 weapon.setData('destroying', true);
                 this.time.delayedCall(5000, () => {
@@ -366,9 +417,14 @@ export default class PlayScene extends Phaser.Scene {
             if (playerNum === 1 && this.p1Weapon) return;
             if (playerNum === 2 && this.p2Weapon) return;
 
+            this.tweens.killTweensOf(weapon);
+
             weapon.isEquipped = true;
+            weapon.setAngle(0);
+
             const body = weapon.body as Phaser.Physics.Arcade.Body;
             body.setEnable(false);
+            body.setAngularVelocity(0);
 
             if (playerNum === 1) {
                 this.p1Weapon = weapon;
@@ -379,22 +435,68 @@ export default class PlayScene extends Phaser.Scene {
         });
     }
 
-    private dropWeapon(playerNum: number) {
+    private dropWeapon(player: Player, playerNum: number) {
         let weaponToDrop: Weapon | null = null;
+        let playerWeaponRef: 'p1Weapon' | 'p2Weapon' | null = null;
+        let controls: RuntimePlayerControls | null = null;
 
         if (playerNum === 1 && this.p1Weapon) {
             weaponToDrop = this.p1Weapon;
-            this.p1Weapon = null;
+            playerWeaponRef = 'p1Weapon';
+            controls = this.p1Controls;
         } else if (playerNum === 2 && this.p2Weapon) {
             weaponToDrop = this.p2Weapon;
-            this.p2Weapon = null;
+            playerWeaponRef = 'p2Weapon';
+            controls = this.p2Controls;
         }
 
-        if (weaponToDrop) {
+        if (weaponToDrop && playerWeaponRef && player.body && controls) {
+            this[playerWeaponRef] = null;
+
             weaponToDrop.isEquipped = false;
+            weaponToDrop.setData('thrownBy', playerNum);
+
             const body = weaponToDrop.body as Phaser.Physics.Arcade.Body;
             body.setEnable(true);
-            body.setVelocityY(-200);
+
+            const baseThrowSpeedX = 550; // Aumentado para más potencia horizontal
+            const baseThrowSpeedY = 350; // Se mantiene para lanzamientos verticales
+            const playerMomentumFactor = 0.5;
+
+            let directionX = 0;
+            let directionY = 0;
+
+            const hasHorizontalInput = controls.left.isDown || controls.right.isDown;
+            const hasVerticalInput = controls.up.isDown || controls.down.isDown;
+
+            if (hasHorizontalInput || hasVerticalInput) {
+                if (controls.up.isDown) directionY = -1;
+                if (controls.down.isDown) directionY = 1;
+                if (controls.left.isDown) directionX = -1;
+                if (controls.right.isDown) directionX = 1;
+            } else {
+                // Comportamiento por defecto: lanzar hacia adelante con un arco
+                directionX = player.facingRight ? 1 : -1;
+                directionY = -0.75;
+            }
+
+            // Si solo hay input vertical, el lanzamiento es puramente vertical
+            if (hasVerticalInput && !hasHorizontalInput) {
+                directionX = 0;
+            }
+
+            // Si solo hay input horizontal, se añade un pequeño arco hacia arriba
+            if (hasHorizontalInput && !hasVerticalInput) {
+                directionY = -0.5;
+            }
+
+            const finalVelocityX = (player.body.velocity.x * playerMomentumFactor) + (directionX * baseThrowSpeedX);
+            let finalVelocityY = (player.body.velocity.y * playerMomentumFactor) + (directionY * baseThrowSpeedY);
+
+            finalVelocityY = Phaser.Math.Clamp(finalVelocityY, -1000, 800);
+
+            body.setVelocity(finalVelocityX, finalVelocityY);
+            body.setAngularVelocity(directionX !== 0 ? (directionX > 0 ? 600 : -600) : (player.facingRight ? 300 : -300));
         }
     }
 
@@ -448,13 +550,13 @@ export default class PlayScene extends Phaser.Scene {
                 });
             }
 
-            this.dropWeapon(playerNum);
+            this.dropWeapon(player, playerNum);
             player.setVisible(false);
             (player.body as Phaser.Physics.Arcade.Body).setEnable(false);
             return;
         }
         
-        this.dropWeapon(playerNum);
+        this.dropWeapon(player, playerNum);
         player.setVisible(false);
         (player.body as Phaser.Physics.Arcade.Body).setEnable(false);
 
@@ -575,5 +677,33 @@ export default class PlayScene extends Phaser.Scene {
                 this.scene.start('MainMenuScene');
             });
         });
+    }
+
+    private handleWeaponCollision(player: Player, playerNum: number, weapon: Weapon) {
+        const weaponBody = weapon.body as Phaser.Physics.Arcade.Body;
+        if (!weaponBody) return;
+
+        const thrownBy = weapon.getData('thrownBy');
+        const isDangerous = !weapon.isEquipped && weaponBody.velocity.length() > 150 && thrownBy && thrownBy !== playerNum;
+
+        const status = playerNum === 1 ? this.p1Status : this.p2Status;
+        if (!isDangerous || status.isDead || status.isInvul) {
+            return;
+        }
+
+        // El arma ya golpeó, se "consume" para no golpear de nuevo.
+        weapon.setData('thrownBy', null);
+
+        // Efecto 1: Empuje (Knockback)
+        const playerBody = player.body as Phaser.Physics.Arcade.Body;
+        if (playerBody) {
+            const knockbackForce = 250;
+            playerBody.setVelocity(knockbackForce * (weaponBody.velocity.x > 0 ? 1 : -1), -200);
+        }
+
+        // Efecto 2: Desarmar al jugador si tiene un arma
+        if (playerNum === 1 ? this.p1Weapon : this.p2Weapon) {
+            this.dropWeapon(player, playerNum);
+        }
     }
 }

@@ -6,8 +6,7 @@ export interface PlayerControls {
     left: number;
     right: number;
     shoot: number;
-    take: number;
-    drop: number;
+    interact: number;
 }
 
 const controlSchema = new Schema<PlayerControls>({
@@ -16,8 +15,7 @@ const controlSchema = new Schema<PlayerControls>({
     left: { type: Number },
     right: { type: Number },
     shoot: { type: Number },
-    take: { type: Number },
-    drop: { type: Number },
+    interact: { type: Number },
 }, { _id: false });
 
 export interface UserDocument extends Document {

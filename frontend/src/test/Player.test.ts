@@ -27,7 +27,9 @@ const mockControls = {
     left: { isDown: false },
     right: { isDown: false },
     up: { isDown: false },
-    down: { isDown: false }
+    down: { isDown: false },
+    shoot: { isDown: false },
+    interact: { isDown: false }
 };
 
 const mockPlay = vi.fn().mockImplementation((key: string) => { 
@@ -85,7 +87,7 @@ describe('Entidad Player (Animaciones Finales y Físicas)', () => {
         PhaserMock = (await import('phaser')).default;
         PhaserMock.Input.Keyboard.JustDown.mockReturnValue(false);
 
-        player = new Player(mockScene as any, 100, 100, 'player_idle', mockControls, false, 0x0000ff);
+        player = new Player(mockScene as any, 100, 100, 'player_idle', mockControls as any, false, 0x0000ff);
     });
 
     it('Debería inicializarse correctamente en estado IDLE', () => {
