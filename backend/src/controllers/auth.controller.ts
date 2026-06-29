@@ -1,32 +1,42 @@
-import type { NextFunction, Request, Response } from 'express';
-import { loginSchema, registerSchema } from '../schemas/auth.schema.js';
-import { loginUser, registerUser } from '../services/auth.service.js';
-import type { AuthenticatedRequest } from '../types/auth.js';
+import type { Request, Response, NextFunction } from 'express';
+import { registerUser, loginUser, verifyUser } from '../services/auth.service.js';
+import type { RegisterInput, LoginInput, VerifyInput } from '../schemas/auth.schema.js';
 
-export async function register(req: Request, res: Response, next: NextFunction) {
+export async function registerUserHandler(
+  req: Request<object, object, RegisterInput>,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    const input = registerSchema.parse(req.body);
-    const result = await registerUser(input);
-
+    const result = await registerUser(req.body);
     res.status(201).json(result);
   } catch (error) {
     next(error);
   }
 }
 
-export async function login(req: Request, res: Response, next: NextFunction) {
+export async function loginUserHandler(
+  req: Request<object, object, LoginInput>,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    const input = loginSchema.parse(req.body);
-    const result = await loginUser(input);
-
+    const result = await loginUser(req.body);
     res.status(200).json(result);
   } catch (error) {
     next(error);
   }
 }
 
-export function getCurrentUser(req: AuthenticatedRequest, res: Response) {
-  res.status(200).json({
-    user: req.user
-  });
+export async function verifyUserHandler(
+  req: Request<object, object, VerifyInput>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const result = await verifyUser(req.body.email, req.body.verificationCode);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
 }

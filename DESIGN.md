@@ -32,35 +32,36 @@ Es un framework "Opensource" y altamente documentado, por lo que a la hora de in
 
 ---
 
-##Estructura de carpetas
+## Estructura de carpetas
 
 ---
 
 Solemne_2/  
 ├── .github/  
-│   └── workflows/                   #Configuración de GitHub Actions (CI/CD)  
-├── Imagenes_conceptos_DESIGN/                         #Carpeta que contiene mockups y bocetos  
-├── frontend/                        #Carpeta principal del juego (visuales y gameplay)  
-│   ├── public/  
-│   └── src/                         #Código fuente  
-│       ├── assets/                  #Recursos de Vue  
-│       ├── components/              #Componentes reactivos de Vue UI  
-│       ├── game/                    #Ecosistema exclusivo del motor Phaser  
-│       │   ├── entities/            #Carpeta para clases de Jugadores/Balas  
-│       │   ├── scenes/              #Carpeta para las escenas (Menú, selección de personaje, gameplay)  
-│       │   └── utils/               #Carpeta con la logica de jugadores, armas, etc.  
-│       ├── state/                   #Directorio de estado global  
-│       └── tests/                   #Pruebas unitarias de la lógica (carpeta utils)  
-└── backend/                         #API REST Node + Express + TypeScript  
+│   └── workflows/                   # Configuración de GitHub Actions (CI/CD)
+├── Imagenes_conceptos_DESIGN/       # Carpeta que contiene mockups y bocetos
+├── frontend/                        # Carpeta principal del juego (visuales y gameplay)
+│   ├── public/                      # Recursos estáticos (imágenes, sonidos) que se sirven directamente
+│   └── src/                         # Código fuente de la aplicación Vue y Phaser
+│       ├── assets/                  # Recursos de Vue procesados por Vite (CSS, etc.)
+│       ├── components/              # Componentes de la interfaz de usuario de Vue (.vue)
+│       ├── game/                    # Lógica principal del juego gestionada por Phaser
+│       │   ├── entities/            # Clases para entidades del juego (Jugador, Bala, etc.)
+│       │   ├── scenes/              # Escenas del juego (Menú, Partida, etc.)
+│       │   └── utils/               # Funciones de utilidad para la lógica del juego
+│       ├── state/                   # Estado global reactivo de la aplicación
+│       └── test/                    # Pruebas unitarias con Vitest
+└── backend/                         # API REST con Node.js, Express y TypeScript
     └── src/  
-        ├── config/                  #Conexion a MongoDB  
-        ├── controllers/             #Controladores REST  
-        ├── middlewares/             #Manejo de errores, 404, auth  
-        ├── models/                  #Modelos Mongoose  
-        ├── routes/                  #Rutas REST  
-        ├── schemas/                 #Validaciones de datos de la API  
-        ├── services/                #Logica de negocio  
-        └── utils/                   #Utilidades compartidas  
+        ├── config/                  # Configuración de la aplicación (ej. conexión a DB)
+        ├── controllers/             # Lógica que maneja las peticiones y respuestas HTTP
+        ├── middlewares/             # Funciones que se ejecutan antes de los controladores (auth, errores)
+        ├── models/                  # Esquemas y modelos de la base de datos (Mongoose)
+        ├── routes/                  # Definición de los endpoints de la API
+        ├── schemas/                 # Esquemas de validación de datos (Zod)
+        ├── services/                # Lógica de negocio principal de la aplicación
+        ├── types/                   # Definiciones de tipos e interfaces de TypeScript
+        └── utils/                   # Funciones de utilidad compartidas en el backend
 
 
 ---

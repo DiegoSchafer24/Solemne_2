@@ -6,7 +6,7 @@ import { HttpError } from '../utils/http-error.js';
 
 function getAuthenticatedUserId(req: AuthenticatedRequest) {
   if (!req.user?.id) {
-    throw new HttpError(401, 'Authenticated user is required');
+    throw new HttpError(401, 'Se requiere un usuario autentificado');
   }
 
   return req.user.id;

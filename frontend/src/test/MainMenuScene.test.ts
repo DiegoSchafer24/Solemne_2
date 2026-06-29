@@ -45,6 +45,15 @@ describe('MainMenuScene', () => {
         scene.scene = {
             start: vi.fn()
         };
+
+        scene.registry = {
+            get: vi.fn(),
+            set: vi.fn()
+        };
+
+        scene.events = {
+            on: vi.fn()
+        };
     });
 
     it('debería registrarse con la clave correcta', () => {

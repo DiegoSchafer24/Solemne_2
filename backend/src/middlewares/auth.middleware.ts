@@ -13,21 +13,21 @@ export async function requireAuth(req: AuthenticatedRequest, _res: Response, nex
     const authHeader = req.headers.authorization;
 
     if (!authHeader?.startsWith('Bearer ')) {
-      throw new HttpError(401, 'Authorization token is required');
+      throw new HttpError(401, 'Se requiere un token de autentificación');
     }
 
     const token = authHeader.slice('Bearer '.length);
     const payload = jwt.verify(token, getJwtSecret()) as JwtPayload;
 
     if (!payload.sub) {
-      throw new HttpError(401, 'Invalid token');
+      throw new HttpError(401, 'Token invalido');
     }
 
     req.user = await getUserById(payload.sub);
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError || error instanceof jwt.TokenExpiredError) {
-      next(new HttpError(401, 'Invalid or expired token'));
+      next(new HttpError(401, 'Token invalido o expirado'));
       return;
     }
 

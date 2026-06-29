@@ -28,9 +28,9 @@ const defaultControls: { player1: PlayerControls, player2: PlayerControls, onlin
         down: Phaser.Input.Keyboard.KeyCodes.DOWN,
         left: Phaser.Input.Keyboard.KeyCodes.LEFT,
         right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
-        shoot: Phaser.Input.Keyboard.KeyCodes.NUMPAD_ZERO,
-        take: Phaser.Input.Keyboard.KeyCodes.NUMPAD_ONE,
-        drop: Phaser.Input.Keyboard.KeyCodes.NUMPAD_TWO
+        shoot: Phaser.Input.Keyboard.KeyCodes.MINUS,
+        take: Phaser.Input.Keyboard.KeyCodes.PERIOD,
+        drop: Phaser.Input.Keyboard.KeyCodes.COMMA
     },
     online: {
         up: Phaser.Input.Keyboard.KeyCodes.W,
@@ -56,6 +56,9 @@ export function getControlName(keyCode: number): string {
         96: 'NUM 0',
         97: 'NUM 1',
         98: 'NUM 2',
+        188: ',',
+        189: '-',
+        190: '.',
     };
 
     if (keyMap[keyCode]) {

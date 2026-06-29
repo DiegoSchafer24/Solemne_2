@@ -10,8 +10,10 @@ export default class MainMenuScene extends Phaser.Scene {
     private logo?: Phaser.GameObjects.Image;
     private initialMenu: MenuView = 'main';
 
+    private sessionText?: Phaser.GameObjects.Text;
     private rebindingText?: Phaser.GameObjects.Text;
     private isRebinding = false;
+    private lastKnownUsername: string | null = null;
 
     private readonly buttonScale = 0.26;
     private readonly buttonHitWidth = 340;
@@ -32,6 +34,8 @@ export default class MainMenuScene extends Phaser.Scene {
         this.load.image('game_logo', 'assets/logo.png');
         this.load.image('button_bg', 'assets/button.png'); 
         this.load.image('back_button', 'assets/back.png');
+        this.load.image('controls_button', 'assets/controls_button.png');
+        this.load.image('logout_button', 'assets/logout_button.png');
     }
 
     create() {
@@ -65,6 +69,16 @@ export default class MainMenuScene extends Phaser.Scene {
         } else {
             this.showMainMenu();
         }
+
+        this.sessionText = this.add.text(20, height - 20, '', {
+            fontSize: '14px',
+            fontFamily: '"Press Start 2P", monospace',
+            color: '#ffffff'
+        }).setOrigin(0, 1);
+
+        this.updateSessionText();
+
+        this.events.on(Phaser.Scenes.Events.WAKE, this.updateSessionText, this);
     }
 
     private showMainMenu() {
@@ -73,8 +87,12 @@ export default class MainMenuScene extends Phaser.Scene {
 
         this.logo?.setVisible(true);
         this.clearMenuItems();
-        this.createMenuButton(width / 2, height / 2 + 60, 'ONLINE', () => {
-            this.showOnlineMenu();
+        this.createMenuButton(width / 2, height / 2 + 60, 'ONLINE', () => {            
+            if (uiState.currentUser) {
+                this.showOnlineMenu();
+            } else {
+                uiState.authModal = 'login';
+            }
         });
         this.createMenuButton(width / 2, height / 2 + 150, 'LOCAL', () => {
             this.showLocalMenu();
@@ -91,10 +109,16 @@ export default class MainMenuScene extends Phaser.Scene {
             this.showMainMenu();
         });
         this.createMenuTitle(width / 2, height / 2 - 35, 'ONLINE');
-        this.createMenuButton(width / 2, height / 2 + 60, 'JUGAR', () => {});
+        this.createMenuButton(width / 2, height / 2 + 60, 'JUGAR', () => {
+
+        });
+        const logoutButton = this.createMenuButton(width - 150, height - 60, 'CERRAR SESIÓN', () => {
+            this.logout();
+        }, 'logout_button');
+        logoutButton?.forEach(item => (item as Phaser.GameObjects.Image).setScale(0.7 * (item.type === 'Image' ? this.buttonScale : 1)));
         this.createMenuButton(width / 2, height / 2 + 150, 'CONTROLES', () => {
             this.showControlsMenu('online');
-        });
+        }, 'controls_button');
     }
 
     private showLocalMenu() {
@@ -112,7 +136,7 @@ export default class MainMenuScene extends Phaser.Scene {
         });
         this.createMenuButton(width / 2, height / 2 + 150, 'CONTROLES', () => {
             this.showControlsMenu('local');
-        });
+        }, 'controls_button');
     }
 
     private showControlsMenu(mode: 'local' | 'online') {
@@ -129,22 +153,19 @@ export default class MainMenuScene extends Phaser.Scene {
             }
         });
 
+        const backgroundOverlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
+        this.menuItems.push(backgroundOverlay);
+
         if (mode === 'local') {
-            const bg1 = this.add.rectangle(width / 4, height / 2 + 20, 350, 320, 0x000000, 0.5);
             this.createMenuTitle(width / 4, height / 2 - 150, 'JUGADOR 1');
             this.createControlsList(controlState.player1, width / 4, height / 2 - 100, 'player1');
-            this.menuItems.push(bg1);
 
-            const bg2 = this.add.rectangle(width * 3 / 4, height / 2 + 20, 350, 320, 0x000000, 0.5);
             this.createMenuTitle(width * 3 / 4, height / 2 - 150, 'JUGADOR 2');
             this.createControlsList(controlState.player2, width * 3 / 4, height / 2 - 100, 'player2');
-            this.menuItems.push(bg2);
 
         } else {
-            const bg = this.add.rectangle(width / 2, height / 2 + 20, 350, 320, 0x000000, 0.5);
             this.createMenuTitle(width / 2, height / 2 - 150, 'CONTROLES ONLINE');
             this.createControlsList(controlState.online, width / 2, height / 2 - 100, 'online');
-            this.menuItems.push(bg);
         }
     }
 
@@ -232,6 +253,10 @@ export default class MainMenuScene extends Phaser.Scene {
         } else {
             controlState[playerKey][action] = newKeyCode;
             keyButtonText.setText(getControlName(newKeyCode)).setColor('#ffff00');
+
+            if (playerKey === 'online') {
+                this.saveOnlineControls();
+            }
         }
 
         this.isRebinding = false;
@@ -266,12 +291,12 @@ export default class MainMenuScene extends Phaser.Scene {
         this.menuItems.push(title);
     }
 
-    private createMenuButton(x: number, y: number, label: string, onClick: () => void) {
-        if (this.isRebinding) return;
+    private createMenuButton(x: number, y: number, label: string, onClick: () => void, textureKey: string = 'button_bg'): Phaser.GameObjects.GameObject[] | undefined {
+        if (this.isRebinding) return undefined;
 
         const pressedScale = 0.9;
 
-        const buttonBg = this.add.image(x, y, 'button_bg')
+        const buttonBg = this.add.image(x, y, textureKey)
             .setOrigin(0.5)
             .setScale(this.buttonScale);
 
@@ -306,6 +331,8 @@ export default class MainMenuScene extends Phaser.Scene {
         });
 
         this.menuItems.push(buttonBg, buttonText);
+
+        return [buttonBg, buttonText];
     }
 
     private createBackButton(onClick: () => void) {
@@ -350,10 +377,59 @@ export default class MainMenuScene extends Phaser.Scene {
         this.menuItems = [];
     }
 
+    private updateSessionText() {
+        if (uiState.currentUser) {
+            this.sessionText?.setText(`Sesión iniciada como: ${uiState.currentUser.username}`);
+        } else {
+            this.sessionText?.setText('Sesión no iniciada');
+        }
+    }
+
+    private logout() {
+        uiState.currentUser = null;
+        this.updateSessionText();
+        this.showMainMenu();
+    }
+
+    private async saveOnlineControls() {
+        const token = localStorage.getItem('token');
+        if (!uiState.currentUser || !token) {
+            console.warn("No se puede guardar los controles: usuario no autenticado.");
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:3001/api/auth/controls', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(controlState.online)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al guardar los controles');
+            }
+
+            console.log('Controles online guardados exitosamente.');
+
+        } catch (error) {
+            console.error('Error al guardar los controles:', error);
+        }
+    }
+
     update() {
         if (this.bg && !this.isRebinding) {
             this.bg.tilePositionX += 0.5;
             this.registry.set('menuBgTilePositionX', this.bg.tilePositionX);
+        }
+
+        const currentUsername = uiState.currentUser?.username ?? null;
+        if (currentUsername !== this.lastKnownUsername) {
+            this.updateSessionText();
+            this.lastKnownUsername = currentUsername;
         }
     }
 }
