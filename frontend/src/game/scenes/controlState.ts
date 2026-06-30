@@ -52,6 +52,12 @@ export function getControlName(keyCode: number): string {
         96: 'NUM 0',
         97: 'NUM 1',
         98: 'NUM 2',
+        67: 'C',
+        68: 'D',
+        73: 'I',
+        74: 'J',
+        75: 'K',
+        76: 'L',
         188: ',',
         189: '-',
         190: '.',
@@ -61,9 +67,5 @@ export function getControlName(keyCode: number): string {
         return keyMap[keyCode];
     }
 
-    if (keyCode >= 65 && keyCode <= 90) {
-        return String.fromCharCode(keyCode);
-    }
-
-    return `Keycode ${keyCode}`;
+    return String.fromCharCode(keyCode);
 }

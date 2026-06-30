@@ -29,6 +29,8 @@ Cuenta con una alta eficiencia en el manejo del DOM para la interfaz de usuario 
 ## Motor de juego: Phaser 3  
 Cuenta con un alto rendimiento, ideal para este tipo de juego teniendo en cuenta la cantidad de proyectiles. Cuenta con un motor de físicas integrado llamado Arcade, ideal para realizar la idea de un shooter 2D, ya que lo podemos utilizar para gestionar hitboxes con un bajo costo de rendimiento.  
 Es un framework "Opensource" y altamente documentado, por lo que a la hora de investigar como realizar cierta función, utilizar alguna heramienta en especifico o como arreglar algun error, es fácil encontrar ayuda en internet.  
+## Servidor Multijugador: Colyseus
+Framework de Node.js para la creación de servidores de juegos multijugador con estado. Se integrará con el backend de Express para gestionar las salas de juego en tiempo real, sincronizando el estado de los jugadores (posición, acciones) y la lógica de la partida.
 
 ---
 
@@ -50,6 +52,7 @@ Solemne_2/
 │       │   ├── scenes/              # Escenas del juego (Menú, Partida, etc.)  
 │       │   └── utils/               # Funciones de utilidad para la lógica del juego  
 │       ├── state/                   # Estado global reactivo de la aplicación  
+│       ├── types/                   # Definiciones de tipos e interfaces de TypeScript para el frontend
 │       └── test/                    # Pruebas unitarias con Vitest  
 └── backend/                         # API REST con Node.js, Express y TypeScript  
     └── src/  
@@ -109,6 +112,8 @@ Campos principales:
 - passwordHash
 - createdAt
 - updatedAt
+- onlineControls
+- countryCode
 
 ## PlayerSettings
 
@@ -120,7 +125,7 @@ Campos principales:
 - selectedSkin
 - musicEnabled
 - sfxEnabled
-- countryCode
+- (El `countryCode` se almacena en el modelo `User` para evitar redundancia)
 
 ## Match
 
@@ -189,7 +194,7 @@ Obtiene victorias, derrotas, partidas jugadas y win rate.
 
 # Servicio REST Externo
 
-(por determinar)
+Se utiliza la API de geolocalización de ip-api.com para determinar el país del jugador a partir de su dirección IP durante el registro o el primer inicio de sesión. El código de país se almacena en el modelo `User`.
 
 ---
 

@@ -70,7 +70,7 @@ ___
 - [x] Inicio de desarrollo del backend
 - [x] Conexión a MongoDB como base de datos
 - [x] Agregar opciónes de registro de usuario y configuraciónes
-- [ ] Integración con servicio externo (REST)
+- [x] Integración con servicio externo (REST)
 
 ___
 

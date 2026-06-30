@@ -9,7 +9,7 @@ const router = Router();
 
 router.post('/register', validate(registerSchema), async (req, res, next) => {
   try {
-    const result = await registerUser(req.body);
+    const result = await registerUser(req.body, req.ip);
     res.status(201).json(result);
   } catch (error) {
     next(error);
@@ -18,7 +18,7 @@ router.post('/register', validate(registerSchema), async (req, res, next) => {
 
 router.post('/login', validate(loginSchema), async (req, res, next) => {
   try {
-    const result = await loginUser(req.body);
+    const result = await loginUser(req.body, req.ip);
     res.json(result);
   } catch (error) {
     next(error);

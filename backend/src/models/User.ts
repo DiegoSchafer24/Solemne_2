@@ -10,12 +10,12 @@ export interface PlayerControls {
 }
 
 const controlSchema = new Schema<PlayerControls>({
-    up: { type: Number },
-    down: { type: Number },
-    left: { type: Number },
-    right: { type: Number },
-    shoot: { type: Number },
-    interact: { type: Number },
+    up: { type: Number, required: true },
+    down: { type: Number, required: true },
+    left: { type: Number, required: true },
+    right: { type: Number, required: true },
+    shoot: { type: Number, required: true },
+    interact: { type: Number, required: true },
 }, { _id: false });
 
 export interface UserDocument extends Document {
@@ -28,6 +28,7 @@ export interface UserDocument extends Document {
   createdAt: Date;
   updatedAt: Date;
   onlineControls?: PlayerControls;
+  countryCode?: string;
 }
 
 const userSchema = new Schema<UserDocument>(
@@ -38,7 +39,8 @@ const userSchema = new Schema<UserDocument>(
     isVerified: { type: Boolean, default: false },
     verificationCode: { type: String },
     verificationCodeExpires: { type: Date },
-    onlineControls: { type: controlSchema, required: false }
+    onlineControls: { type: controlSchema, required: false },
+    countryCode: { type: String, required: false }
   },
   {
     timestamps: true,

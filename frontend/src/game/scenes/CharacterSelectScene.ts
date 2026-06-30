@@ -14,6 +14,7 @@ const COLORS = [
 ];
 
 export default class CharacterSelectScene extends Phaser.Scene {
+    private bg!: Phaser.GameObjects.TileSprite;
     private p1Index: number = 0;
     private p2Index: number = 1;
     private readonly backButtonScale = 2;
@@ -34,6 +35,7 @@ export default class CharacterSelectScene extends Phaser.Scene {
     preload() {
         const frameConf = { frameWidth: 32, frameHeight: 48 };
         this.load.spritesheet('player_idle', '/assets/characters/player_idle.png', frameConf);
+        this.load.image('menu_background', 'assets/menu_bg.png');
         this.load.image('back_button', '/assets/back.png');
     }
 
@@ -46,6 +48,21 @@ export default class CharacterSelectScene extends Phaser.Scene {
         this.input.keyboard!.removeAllListeners();
         
         const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+
+        if (this.textures.exists('menu_background')) {
+            const imgHeight = this.textures.get('menu_background').get().height;
+            const scale = height / imgHeight;
+
+            this.bg = this.add.tileSprite(0, 0, width / scale, height / scale, 'menu_background')
+                .setOrigin(0, 0)
+                .setScale(scale)
+                .setDepth(-1);
+            this.bg.tilePositionX = this.registry.get('menuBgTilePositionX') ?? 0;
+        }
+
+        this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
+
         this.createBackButton();
 
         this.add.text(width / 2, 100, 'SELECCIÓN DE COLOR', {
@@ -91,6 +108,13 @@ export default class CharacterSelectScene extends Phaser.Scene {
             for (const key in p1Controls) { p1Controls[key as keyof RuntimePlayerControls].removeAllListeners(); }
             for (const key in p2Controls) { p2Controls[key as keyof RuntimePlayerControls].removeAllListeners(); }
         });
+    }
+
+    update() {
+        if (this.bg) {
+            this.bg.tilePositionX += 0.5;
+            this.registry.set('menuBgTilePositionX', this.bg.tilePositionX);
+        }
     }
 
     private createBackButton() {

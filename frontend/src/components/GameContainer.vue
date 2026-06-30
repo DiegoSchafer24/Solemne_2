@@ -112,14 +112,14 @@ watch(() => uiState.authModal, (newValue) => {
   const isModalOpen = newValue !== 'hidden';
 
   game.scene.getScenes(true).forEach(scene => {
-    authError.value = ''; // Limpia el error al cambiar de modal
+    authError.value = '';
     scene.input.enabled = !isModalOpen;
   });
 });
 
 onMounted(() => {
   const config: Phaser.Types.Core.GameConfig = {
-    type: Phaser.AUTO, //Usa WebGL si está disponible, si no, usa Canvas 2D
+    type: Phaser.AUTO,
     width: 1280,
     height: 720,
     parent: 'game-container',
@@ -161,6 +161,14 @@ onUnmounted(() => {
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
         </svg>
       </div>
+      <div v-if="uiState.currentUser?.countryCode" class="player-info p1">
+        <img 
+          :src="`https://flagcdn.com/w40/${uiState.currentUser.countryCode.toLowerCase()}.png`" 
+          :alt="`Bandera de ${uiState.currentUser.countryCode}`"
+          class="player-flag"
+        />
+        <span>{{ uiState.currentUser.username }}</span>
+      </div>
 
       <div class="health-bar p2">
         <svg v-for="i in 3" :key="'p2-'+i" class="heart" viewBox="0 0 24 24" 
@@ -168,6 +176,10 @@ onUnmounted(() => {
              :fill="i <= uiState.p2.lives ? uiState.p2.color : 'none'">
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
         </svg>
+      </div>
+      <!-- Placeholder for Player 2 info in online mode -->
+      <div class="player-info p2">
+        <!-- This will be populated in online mode -->
       </div>
 
     </div>
@@ -269,6 +281,26 @@ onUnmounted(() => {
   transition: fill 0.3s ease;
 }
 
+.player-info {
+  position: absolute;
+  top: 70px; /* Debajo de la barra de vida */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: white;
+  font-family: '"Press Start 2P", monospace';
+  font-size: 14px;
+}
+
+.player-info.p1 { left: 30px; }
+.player-info.p2 { right: 30px; flex-direction: row-reverse; }
+
+.player-flag {
+  width: 30px;
+}
 /* Auth Styles */
 .auth-overlay {
   position: fixed;

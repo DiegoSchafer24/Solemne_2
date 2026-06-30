@@ -43,13 +43,14 @@ export function getJwtSecret() {
   return jwtSecret;
 }
 
-export function toAuthUser(user: { _id: unknown; username: string; email: string; createdAt: Date; onlineControls?: any }): AuthUser {
+export function toAuthUser(user: { _id: unknown; username: string; email: string; createdAt: Date; onlineControls?: any; countryCode?: string }): AuthUser {
   return {
     id: String(user._id),
     username: user.username,
     email: user.email,
     createdAt: user.createdAt,
-    onlineControls: user.onlineControls
+    onlineControls: user.onlineControls,
+    countryCode: user.countryCode
   };
 }
 
@@ -69,30 +70,58 @@ function createToken(userId: string) {
   });
 }
 
-export async function registerUser(input: RegisterInput) {
+async function getCountryCodeFromIp(ip: string | undefined): Promise<string | undefined> {
+  // Para pruebas locales, si la IP es localhost, usamos una IP pública de Chile.
+  const testIp = process.env.TEST_IP;
+  if (!ip || ip.includes('127.0.0.1') || ip === '::1') {
+    ip = testIp || undefined;
+  }
+
+  try {
+    const geoResponse = await fetch(`http://ip-api.com/json/${ip}?fields=status,countryCode`);
+    const geoData = await geoResponse.json();
+    if (geoData.status === 'success' && geoData.countryCode) {
+      return geoData.countryCode;
+    }
+  } catch (geoError) {
+    console.error('Could not fetch geolocation data:', geoError);
+  }
+
+  return undefined;
+}
+
+export async function registerUser(input: RegisterInput, ip: string | undefined) {
   const email = input.email.toLowerCase();
   const existingUser = await User.findOne<UserDocument>({
     $or: [{ email }, { username: input.username }]
   });
 
   if (existingUser) {
-    throw new HttpError(409, 'Nombre de usuario y/o contraseña ya en uso');
+    throw new HttpError(409, 'Nombre de usuario y/o correo electrónico ya en uso');
   }
 
-  const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-  const verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
-
   const passwordHash = await bcrypt.hash(input.password, 10);
-  const user = await User.create({
+
+  const newUserPayload: Partial<UserDocument> = {
     username: input.username,
     email,
     passwordHash,
-    verificationCode,
-    verificationCodeExpires
-  });
+    verificationCode: Math.floor(100000 + Math.random() * 900000).toString(),
+    verificationCodeExpires: new Date(Date.now() + 10 * 60 * 1000)
+  };
+
+  const countryCode = await getCountryCodeFromIp(ip);
+  if (countryCode) {
+    newUserPayload.countryCode = countryCode;
+  }
+
+  const user = await User.create(newUserPayload);
 
   try {
-    await sendVerificationEmail(email, verificationCode);
+    if (!user.verificationCode) {
+      throw new Error('Código de verificación no encontrado para el nuevo usuario.');
+    }
+    await sendVerificationEmail(user.email, user.verificationCode);
   } catch (error) {
     console.error('Error sending verification email:', error);
     await User.deleteOne({ _id: user._id });
@@ -102,7 +131,7 @@ export async function registerUser(input: RegisterInput) {
   return { message: 'Usuario registrado. Por favor revisa tu correo electrónico para verificar tu cuenta.' };
 }
 
-export async function loginUser(input: LoginInput) {
+export async function loginUser(input: LoginInput, ip: string | undefined) {
   const login = input.login.toLowerCase();
   const user = await User.findOne<UserDocument>({
     $or: [{ email: login }, { username: login }]
@@ -120,6 +149,14 @@ export async function loginUser(input: LoginInput) {
 
   if (!isPasswordValid) {
     throw new HttpError(401, 'Correo electrónico o contraseña invalidos');
+  }
+
+  if (!user.countryCode) {
+    const countryCode = await getCountryCodeFromIp(ip);
+    if (countryCode) {
+      user.countryCode = countryCode;
+      await user.save();
+    }
   }
 
   const authUser = toAuthUser(user);

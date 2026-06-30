@@ -7,6 +7,7 @@ export interface AuthUser {
   email: string;
   createdAt: Date;
   onlineControls?: PlayerControls;
+  countryCode?: string;
 }
 
 export interface AuthenticatedRequest extends Request {

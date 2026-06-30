@@ -176,7 +176,6 @@ export default class PlayScene extends Phaser.Scene {
             const weapon = weaponObject as Weapon;
             const body = weapon.body as Phaser.Physics.Arcade.Body;
 
-            // Un arma lanzada que golpea una plataforma deja de ser peligrosa
             if (weapon.getData('thrownBy')) {
                 weapon.setData('thrownBy', null);
             }
@@ -315,11 +314,43 @@ export default class PlayScene extends Phaser.Scene {
         const midY = (this.player1.y + this.player2.y) / 2;
         this.cameraTarget.setPosition(midX, midY);
 
+        this.updateCameraZoom();
+        this.updateWeaponSpawners();
+
+        this.weapons.getChildren().forEach((w: any) => {
+            const weapon = w as Weapon;
+            const body = weapon.body as Phaser.Physics.Arcade.Body;
+
+            if (body) {
+
+                if (!body.touching.down && weapon.getData('isSettling')) {
+                    weapon.setData('isSettling', false);
+                    
+                    body.setDragX(100); 
+                }
+            }
+
+            if (!weapon.isEquipped && weapon.currentAmmo <= 0 && !weapon.getData('destroying')) {
+                weapon.setData('destroying', true);
+                this.time.delayedCall(5000, () => {
+                    if (!weapon.isEquipped) {
+                        weapon.destroy();
+                    } else {
+                        weapon.setData('destroying', false);
+                    }
+                });
+            }
+        });
+    }
+
+    private updateCameraZoom() {
         const dist = Phaser.Math.Distance.Between(this.player1.x, this.player1.y, this.player2.x, this.player2.y);
         let zoom = 1000 / (dist + 500);
         zoom = Phaser.Math.Clamp(zoom, 0.6, 1.3);
         this.cameras.main.setZoom(zoom);
+    }
 
+    private updateWeaponSpawners() {
         const currentTime = this.time.now;
 
         this.spawners.forEach(spawner => {
@@ -335,32 +366,6 @@ export default class PlayScene extends Phaser.Scene {
                 spawner.isOccupied = false;
                 spawner.activeWeapon = null;
                 spawner.nextSpawnTime = currentTime + 5000;
-            }
-        });
-
-        this.weapons.getChildren().forEach((w: any) => {
-            const weapon = w as Weapon;
-            const body = weapon.body as Phaser.Physics.Arcade.Body;
-
-            if (body) {
-                // Restablece el estado de "asentamiento" y la fricción si el arma está en el aire
-                if (!body.touching.down && weapon.getData('isSettling')) {
-                    weapon.setData('isSettling', false);
-                    
-                    // Restablece una fricción baja para la resistencia del aire
-                    body.setDragX(100); 
-                }
-            }
-
-            if (!weapon.isEquipped && weapon.currentAmmo <= 0 && !weapon.getData('destroying')) {
-                weapon.setData('destroying', true);
-                this.time.delayedCall(5000, () => {
-                    if (!weapon.isEquipped) {
-                        weapon.destroy();
-                    } else {
-                        weapon.setData('destroying', false);
-                    }
-                });
             }
         });
     }
@@ -459,8 +464,8 @@ export default class PlayScene extends Phaser.Scene {
             const body = weaponToDrop.body as Phaser.Physics.Arcade.Body;
             body.setEnable(true);
 
-            const baseThrowSpeedX = 550; // Aumentado para más potencia horizontal
-            const baseThrowSpeedY = 350; // Se mantiene para lanzamientos verticales
+            const baseThrowSpeedX = 550;
+            const baseThrowSpeedY = 350;
             const playerMomentumFactor = 0.5;
 
             let directionX = 0;
@@ -475,17 +480,14 @@ export default class PlayScene extends Phaser.Scene {
                 if (controls.left.isDown) directionX = -1;
                 if (controls.right.isDown) directionX = 1;
             } else {
-                // Comportamiento por defecto: lanzar hacia adelante con un arco
                 directionX = player.facingRight ? 1 : -1;
                 directionY = -0.75;
             }
 
-            // Si solo hay input vertical, el lanzamiento es puramente vertical
             if (hasVerticalInput && !hasHorizontalInput) {
                 directionX = 0;
             }
 
-            // Si solo hay input horizontal, se añade un pequeño arco hacia arriba
             if (hasHorizontalInput && !hasVerticalInput) {
                 directionY = -0.5;
             }
@@ -691,17 +693,14 @@ export default class PlayScene extends Phaser.Scene {
             return;
         }
 
-        // El arma ya golpeó, se "consume" para no golpear de nuevo.
         weapon.setData('thrownBy', null);
 
-        // Efecto 1: Empuje (Knockback)
         const playerBody = player.body as Phaser.Physics.Arcade.Body;
         if (playerBody) {
             const knockbackForce = 250;
             playerBody.setVelocity(knockbackForce * (weaponBody.velocity.x > 0 ? 1 : -1), -200);
         }
 
-        // Efecto 2: Desarmar al jugador si tiene un arma
         if (playerNum === 1 ? this.p1Weapon : this.p2Weapon) {
             this.dropWeapon(player, playerNum);
         }
